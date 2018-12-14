@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import static com.google.common.io.Files.asCharSink;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.xml.bind.JAXBContext.newInstance;
@@ -24,9 +25,9 @@ public class XmlGenerator {
         StringWriter writer = new StringWriter();
         try {
             createMarshaller(Laborabrechnung.class).marshal(laborabrechnung, writer);
-//            write(writer.toString(), xmlFile, UTF_8);
-//        } catch (IOException | JAXBException e) {
-        } catch ( JAXBException e) {
+            // OLD: com.google.common.io.Files.write(writer.toString(), xmlFile, UTF_8);
+            asCharSink(xmlFile, UTF_8).write(writer.toString());
+        } catch (IOException | JAXBException e) {
             log.error("could not generate xml file", e);
         }
         return xmlFile;

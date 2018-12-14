@@ -58,6 +58,11 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.spockframework:spock-core:1.1-groovy-2.4'
+    testImplementation 'org.spockframework:spock-spring:1.1-groovy-2.4'
+    // optional dependencies https://mvnrepository.com/artifact/org.spockframework/spock-core/1.1-groovy-2.4
+    testImplementation 'cglib:cglib-nodep:3.2.2'
+    testImplementation 'org.jetbrains:annotations:13.0'
 }
 
 dependencyManagement {
