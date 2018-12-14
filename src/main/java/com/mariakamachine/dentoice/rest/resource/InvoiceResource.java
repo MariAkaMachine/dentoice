@@ -4,6 +4,7 @@ import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import com.mariakamachine.dentoice.rest.dto.Invoice;
 import com.mariakamachine.dentoice.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,6 +33,11 @@ public class InvoiceResource {
     @GetMapping(path = "/{id}", produces = APPLICATION_JSON_UTF8_VALUE)
     public InvoiceEntity getById(@PathVariable Long id) {
         return service.getById(id);
+    }
+
+    @GetMapping(path = "/{id}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public byte[] getPdfById(@PathVariable Long id) {
+        return service.getPdfById(id);
     }
 
     @GetMapping(path = "/dentists/{id}", produces = APPLICATION_JSON_UTF8_VALUE)

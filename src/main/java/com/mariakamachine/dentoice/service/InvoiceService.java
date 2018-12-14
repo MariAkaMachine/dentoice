@@ -12,9 +12,11 @@ import com.mariakamachine.dentoice.rest.dto.Material;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mariakamachine.dentoice.util.InvoicePdfGenerator.generatePdf;
 import static java.lang.String.format;
 
 @Service
@@ -39,11 +41,16 @@ public class InvoiceService {
 
     public InvoiceEntity getById(long id) {
         return invoiceRepository.findById(id)
-                       .orElseThrow(() -> new NotFoundException(format("could not find invoice with [ id: %d ]", id)));
+                .orElseThrow(() -> new NotFoundException(format("could not find invoice with [ id: %d ]", id)));
     }
 
     public List<InvoiceEntity> getAllByDentistId(long id) {
         return invoiceRepository.findAllByDentistIdOrderByDate(id);
+    }
+
+    public byte[] getPdfById(Long id) {
+//        return generatePdf(getById(id));
+        return generatePdf(new InvoiceEntity());
     }
 
     // update
