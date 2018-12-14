@@ -1,0 +1,30 @@
+{
+  "dentist": 1,
+  "patient": "Pfeil, Susanne",
+  "description": "36 VG-Krone",
+  "xmlNumber": "617200-F7357-KB-66399-2044-2",
+  "invoiceType": "INVOICE",
+  "insuranceType": "PUBLIC",
+  "date": "2018-03-13",
+  "efforts": [
+    {
+      "position": "0732",
+      "quantity": 1.00
+    },
+    {
+      "position": "0001",
+      "description": "Modell aus Hartgips",
+      "quantity": 1.00,
+      "pricePerUnit": 8.08
+    }
+  ],
+  "materials": [
+    {
+      "position": "9005",
+      "description": "PlatinLloyd 100",
+      "quantity": 3.60,
+      "pricePerUnit": 51.25,
+      "notes": "BEGO Legierung CE 4004"
+    }
+  ]
+}

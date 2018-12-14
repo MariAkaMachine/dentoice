@@ -1,0 +1,35 @@
+databaseChangeLog:
+
+  - preconditions:
+      - runningAs:
+          username: postgres
+      - dbms:
+          type:
+            - postgresql
+            - hsqldb
+
+  - changeSet:
+      id: 1
+      author: mari
+      comment: initial table creation
+      changes:
+
+        - sqlFile:
+            path: ../sql/create_dentists_table.sql
+            relativeToChangelogFile: true
+
+#        - sqlFile:
+#            path: ../sql/create_patients_table.sql
+#            relativeToChangelogFile: true
+
+        - sqlFile:
+            path: ../sql/create_efforts_table.sql
+            relativeToChangelogFile: true
+
+        - sqlFile:
+            path: ../sql/create_materials_table.sql
+            relativeToChangelogFile: true
+
+        - sqlFile:
+            path: ../sql/create_invoices_table.sql
+            relativeToChangelogFile: true
