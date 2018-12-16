@@ -28,17 +28,22 @@ public class MaterialEntity implements Serializable {
     @NotNull
     @Column(name = "price_per_unit")
     private Double pricePerUnit;
+    @NotNull
+    @Column(name = "is_metal")
+    private boolean isMetal;
 
     public MaterialEntity(Material material) {
         this.position = material.getPosition();
         this.name = material.getName();
         this.pricePerUnit = material.getPricePerUnit();
+        this.isMetal = material.isMetal();
     }
 
     public MaterialEntity updateEntity(Material material) {
         this.position = material.getPosition();
         this.name = material.getName();
         this.pricePerUnit = material.getPricePerUnit();
+        this.isMetal = material.isMetal();
         return this;
     }
 

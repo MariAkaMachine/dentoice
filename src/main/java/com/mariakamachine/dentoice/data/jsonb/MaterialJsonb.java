@@ -32,6 +32,7 @@ public class MaterialJsonb implements Serializable {
     @NotNull
     @Min(0)
     Double pricePerUnit;
+    boolean isMetal;
 
     public MaterialJsonb(Material material, MaterialEntity entity) {
         this.position = material.getPosition();
@@ -39,6 +40,7 @@ public class MaterialJsonb implements Serializable {
         this.notes = isBlank(material.getNotes()) ? null : material.getNotes();
         this.quantity = material.getQuantity();
         this.pricePerUnit = material.getPricePerUnit() == null ? entity.getPricePerUnit() : material.getPricePerUnit();
+        this.isMetal = material.isMetal();
     }
 
 }

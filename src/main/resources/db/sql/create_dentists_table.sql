@@ -8,5 +8,5 @@ CREATE TABLE dentists (
   city       VARCHAR(255) NOT NULL,
   phone      VARCHAR(255),
   fax        VARCHAR(255),
-  email      VARCHAR(255)
+  email      VARCHAR(255) NOT NULL
 );

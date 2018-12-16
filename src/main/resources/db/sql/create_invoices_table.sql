@@ -6,6 +6,6 @@ CREATE TABLE invoices (
   xml_number     VARCHAR(255) NOT NULL,
   invoice_type   VARCHAR(255) NOT NULL,
   insurance_type VARCHAR(255) NOT NULL,
-  date           DATE,
-  costs          JSONB
+  date           DATE         NOT NULL,
+  costs          JSONB        NOT NULL
 );

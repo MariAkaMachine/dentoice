@@ -43,6 +43,7 @@ public class InvoicePdfGenerator {
 
     private BigDecimal effortsSum = new BigDecimal(0.0);
     private BigDecimal materialsSum = new BigDecimal(0.0);
+    private BigDecimal metalsSum = new BigDecimal(0.0);
 
     public byte[] generatePdf(InvoiceProperties invoiceProperties, InvoiceEntity invoice) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -55,10 +56,24 @@ public class InvoicePdfGenerator {
             PdfWriter writer = getInstance(pdf, stream);
             pdf.open();
 
-            pdf.add(recipientDetails(invoice));
-            pdf.add(invoiceDetails(invoice));
-            pdf.add(costsTable(invoice.getCosts()));
-            PdfPTable footerDetails = footerDetails(invoiceProperties, invoice);
+
+            PdfPTable recipient = recipientDetails(invoice.getDentist());
+            pdf.add(recipient);
+            PdfPTable details = invoiceDetails(invoice);
+            pdf.add(details);
+            PdfPTable costsTable = costsTable(invoice.getCosts());
+            pdf.add(costsTable);
+            PdfPTable footerDetails = footerDetails(invoiceProperties);
+
+            System.out.println("DOC PAGE SIZE: " + writer.getPageSize());
+            System.out.println("COSTS TABLE: " + costsTable.getTotalHeight());
+            System.out.println(String.format("LEFT HEIGHT: %s", A4.getHeight() - pdf.topMargin() - pdf.bottomMargin() - details.getTotalHeight() - costsTable.getTotalHeight() - recipient.getTotalHeight()));
+            System.out.println("FOOTER HEIGHT: " + footerDetails.getTotalHeight());
+
+            if (costsTable.getTotalHeight() > 410) {
+                pdf.newPage();
+            }
+
             footerDetails.writeSelectedRows(0, -1, pdf.left(), footerDetails.getTotalHeight() + pdf.bottom(), writer.getDirectContent());
 
             pdf.close();
@@ -68,16 +83,15 @@ public class InvoicePdfGenerator {
         return stream.toByteArray();
     }
 
-    private PdfPTable recipientDetails(InvoiceEntity invoice) {
+    private PdfPTable recipientDetails(DentistEntity dentist) {
         PdfPTable table = new PdfPTable(1);
         table.setWidthPercentage(50);
         table.setHorizontalAlignment(ALIGN_LEFT);
 
-//        DentistEntity dentist = invoice.getDentist();
         /*
          * REMOVE
          */
-        DentistEntity dentist = new DentistEntity();
+        dentist = new DentistEntity();
         dentist.setTitle("Herr Zahnarzt");
         dentist.setFirstName("Halo I");
         dentist.setLastName("Bims");
@@ -106,6 +120,7 @@ public class InvoicePdfGenerator {
          */
         invoice.setId(2L);
         invoice.setDate(LocalDate.now());
+        invoice.setDescription("24 Tele");
         invoice.setPatient("Dieter MacAdam");
         invoice.setInsuranceType(InsuranceType.PRIVATE);
         /*
@@ -116,6 +131,8 @@ public class InvoicePdfGenerator {
         table.addCell(cell(valueOf(invoice.getId()), 9));
         table.addCell(cell("Rechnungsdatum", 4));
         table.addCell(cell(invoice.getDate().format(ofPattern("dd.MM.yyyy")), 8));
+        table.addCell(cell("Art der Arbeit", 4));
+        table.addCell(cell(invoice.getDescription(), 8));
         table.addCell(cell("Patient", 4));
         table.addCell(cell(invoice.getPatient(), 8));
         table.addCell(cell("Kassenart", 4));
@@ -151,24 +168,27 @@ public class InvoicePdfGenerator {
         material2.setNotes("BEGO Legierung CE ja");
         material2.setQuantity(3.60);
         material2.setPricePerUnit(51.25);
+        material2.setMetal(true);
         MaterialJsonb material1 = new MaterialJsonb();
         material1.setPosition("7895");
         material1.setDescription("PlatinLloyd 100");
         material1.setQuantity(3.60);
         material1.setPricePerUnit(51.25);
-        costs.setMaterials(Arrays.asList(material2));
+        costs.setMaterials(Arrays.asList(material1, material2));
         /*
          * REMOVE
          */
+        for (int i = 0; i < 20; i++) {
 
-        for (EffortJsonb effort : costs.getEfforts()) {
-            table.addCell(cell(effort.getPosition()));
-            table.addCell(cell(effort.getDescription()));
-            table.addCell(cell(valueOf(effort.getQuantity())));
-            table.addCell(cellRight(round(effort.getPricePerUnit()).toPlainString()));
-            BigDecimal sum = round(effort.getQuantity() * effort.getPricePerUnit());
-            table.addCell(cellRight(sum.toPlainString()));
-            effortsSum = effortsSum.add(sum);
+            for (EffortJsonb effort : costs.getEfforts()) {
+                table.addCell(cell(effort.getPosition()));
+                table.addCell(cell(effort.getDescription()));
+                table.addCell(cell(valueOf(effort.getQuantity())));
+                table.addCell(cellRight(round(effort.getPricePerUnit()).toPlainString()));
+                BigDecimal sum = round(effort.getQuantity() * effort.getPricePerUnit());
+                table.addCell(cellRight(sum.toPlainString()));
+                effortsSum = effortsSum.add(sum);
+            }
         }
 
         for (MaterialJsonb material : costs.getMaterials()) {
@@ -183,16 +203,19 @@ public class InvoicePdfGenerator {
             table.addCell(cellRight(round(material.getPricePerUnit()).toPlainString()));
             BigDecimal sum = round(material.getQuantity() * material.getPricePerUnit());
             table.addCell(cellRight(sum.toPlainString()));
+            if (material.isMetal()) {
+                metalsSum = metalsSum.add(sum);
+            }
             materialsSum = materialsSum.add(sum);
         }
 
         addEmptyRow(table);
 
         table.addCell(cell(""));
-        PdfPCell sumMaterialsRow = cell("Berechnetes Material");
-        sumMaterialsRow.setColspan(3);
-        table.addCell(sumMaterialsRow);
-        table.addCell(cellRight(materialsSum.toPlainString()));
+        PdfPCell metalsSumRow = cell("Berechnetes Edelmetall");
+        metalsSumRow.setColspan(3);
+        table.addCell(metalsSumRow);
+        table.addCell(cellRight(metalsSum.toPlainString()));
 
         addEmptyRow(table);
 
@@ -212,7 +235,7 @@ public class InvoicePdfGenerator {
         table.addCell(headerCellRight("Gesamtpreis"));
     }
 
-    private PdfPTable footerDetails(InvoiceProperties invoiceProperties, InvoiceEntity invoice) {
+    private PdfPTable footerDetails(InvoiceProperties invoiceProperties) {
         PdfPTable table = new PdfPTable(7);
         table.setTotalWidth(A4.getWidth() - 100);
         table.setLockedWidth(true);

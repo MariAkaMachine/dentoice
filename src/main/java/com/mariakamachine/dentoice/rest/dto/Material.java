@@ -20,5 +20,6 @@ public class Material {
     Double quantity;
     @Min(0)
     Double pricePerUnit;
+    boolean isMetal;
 
 }
