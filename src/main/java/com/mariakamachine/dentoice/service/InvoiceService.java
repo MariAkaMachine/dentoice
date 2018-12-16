@@ -1,5 +1,6 @@
 package com.mariakamachine.dentoice.service;
 
+import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.CostWrapperEntity;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
@@ -9,27 +10,28 @@ import com.mariakamachine.dentoice.exception.NotFoundException;
 import com.mariakamachine.dentoice.rest.dto.Effort;
 import com.mariakamachine.dentoice.rest.dto.Invoice;
 import com.mariakamachine.dentoice.rest.dto.Material;
+import com.mariakamachine.dentoice.util.InvoicePdfGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mariakamachine.dentoice.util.InvoicePdfGenerator.generatePdf;
 import static java.lang.String.format;
 
 @Service
 public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
+    private final InvoiceProperties invoiceProperties;
     private final DentistService dentistService;
     private final EffortService effortService;
     private final MaterialService materialService;
 
     @Autowired
-    public InvoiceService(InvoiceRepository invoiceRepository, DentistService dentistService, EffortService effortService, MaterialService materialService) {
+    public InvoiceService(InvoiceRepository invoiceRepository, InvoiceProperties invoiceProperties, DentistService dentistService, EffortService effortService, MaterialService materialService) {
         this.invoiceRepository = invoiceRepository;
+        this.invoiceProperties = invoiceProperties;
         this.dentistService = dentistService;
         this.effortService = effortService;
         this.materialService = materialService;
@@ -49,8 +51,8 @@ public class InvoiceService {
     }
 
     public byte[] getPdfById(Long id) {
-//        return generatePdf(getById(id));
-        return generatePdf(new InvoiceEntity());
+//        return new InvoicePdfGenerator().generatePdf(getById(id));
+        return new InvoicePdfGenerator().generatePdf(invoiceProperties, new InvoiceEntity());
     }
 
     // update

@@ -1,7 +1,7 @@
 package dentoice.util
 
 
-import com.mariakamachine.dentoice.config.properties.InvoiceXmlProperties
+import com.mariakamachine.dentoice.config.properties.InvoiceProperties
 import com.mariakamachine.dentoice.data.entity.CostWrapperEntity
 import com.mariakamachine.dentoice.data.entity.DentistEntity
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity
@@ -19,7 +19,7 @@ class XmlGeneratorSpec extends Specification {
 
     def "generate valid xml from invoice entity"() {
         given:
-        def properties = [xsdVersion: "4.0", softwareVersion: "0.0.1", mwstInProzent: 7.0] as InvoiceXmlProperties
+        def properties = [xsdVersion: "4.0", softwareVersion: "0.0.1", mwstInPercentage: 7.0] as InvoiceProperties
 
         def efforts = [
                 [position: "0732", description: "Desinfektion", quantity: 1.00, pricePerUnit: 6.32] as EffortJsonb,
@@ -40,7 +40,7 @@ class XmlGeneratorSpec extends Specification {
         ] as InvoiceEntity
 
         when:
-        File xmlFile = XmlGenerator.generateInvoiceXmlFile(InvoiceConverter.convertToXmlModel(invoice, properties))
+        File xmlFile = XmlGenerator.generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(invoice, properties))
 
         then:
         xmlFile.name == "${invoice.xmlNumber}.xml"
