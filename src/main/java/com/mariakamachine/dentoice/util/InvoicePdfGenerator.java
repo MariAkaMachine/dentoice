@@ -27,6 +27,7 @@ import static com.itextpdf.text.FontFactory.*;
 import static com.itextpdf.text.PageSize.A4;
 import static com.itextpdf.text.Rectangle.*;
 import static com.itextpdf.text.pdf.PdfWriter.getInstance;
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.math.BigDecimal.ROUND_HALF_DOWN;
 import static java.time.format.DateTimeFormatter.ofPattern;
@@ -56,25 +57,46 @@ public class InvoicePdfGenerator {
             PdfWriter writer = getInstance(pdf, stream);
             pdf.open();
 
+            invoice.setId(186054L);
+
+            writer.setPageEvent(new PdfPageNumberEvent(invoice.getId()));
 
             PdfPTable recipient = recipientDetails(invoice.getDentist());
-            pdf.add(recipient);
             PdfPTable details = invoiceDetails(invoice);
-            pdf.add(details);
             PdfPTable costsTable = costsTable(invoice.getCosts());
-            pdf.add(costsTable);
             PdfPTable footerDetails = footerDetails(invoiceProperties);
 
-            System.out.println("DOC PAGE SIZE: " + writer.getPageSize());
-            System.out.println("COSTS TABLE: " + costsTable.getTotalHeight());
-            System.out.println(String.format("LEFT HEIGHT: %s", A4.getHeight() - pdf.topMargin() - pdf.bottomMargin() - details.getTotalHeight() - costsTable.getTotalHeight() - recipient.getTotalHeight()));
-            System.out.println("FOOTER HEIGHT: " + footerDetails.getTotalHeight());
+            pdf.add(recipient);
+            pdf.add(details);
+            pdf.add(costsTable);
 
-            if (costsTable.getTotalHeight() > 410) {
+            float margin = writer.getCurrentPageNumber() * pdf.topMargin() + writer.getCurrentPageNumber() * pdf.bottomMargin();
+            System.out.println(format("MARGIN HEIGHT: %s", margin));
+            System.out.println(format("RECIPIENT HEIGHT: %s", recipient.getTotalHeight()));
+            System.out.println(format("DETAILS HEIGHT: %s", details.getTotalHeight()));
+            System.out.println(format("COSTS HEIGHT: %s", costsTable.getTotalHeight()));
+            System.out.println(format("COSTS HEIGHT: %s", footerDetails.getTotalHeight()));
+
+            float docHeight = margin + recipient.getTotalHeight() + details.getTotalHeight() + 20 + costsTable.getTotalHeight() + writer.getCurrentPageNumber() * 10 + footerDetails.getTotalHeight();
+
+            System.out.println(format("TOTAL HEIGHT: %s", docHeight));
+
+
+//            System.out.println("FOOTER HEIGHT: " + footerDetails.getTotalHeight());
+//            System.out.println("MODULO: " + docHeight % writer.getPageSize().getHeight());
+            System.out.println("page: " + writer.getCurrentPageNumber());
+            System.out.println(format("leftover: %s", writer.getCurrentPageNumber() * writer.getPageSize().getHeight() - docHeight));
+
+
+//            if (writer.getCurrentPageNumber() == 1 && costsTable.getTotalHeight() > 400) {
+            if (writer.getCurrentPageNumber() * writer.getPageSize().getHeight() - docHeight < 35) {
                 pdf.newPage();
+//            } else if (writer.getCurrentPageNumber() * writer.getPageSize().getHeight() - costsTable.getTotalHeight() > 400) {
+//                pdf.newPage();
             }
 
             footerDetails.writeSelectedRows(0, -1, pdf.left(), footerDetails.getTotalHeight() + pdf.bottom(), writer.getDirectContent());
+
 
             pdf.close();
         } catch (DocumentException e) {
@@ -127,7 +149,7 @@ public class InvoicePdfGenerator {
          * REMOVE
          */
 
-        table.addCell(cell("Rechnugnsnummer", 5));
+        table.addCell(cell("Rechnungsnummer", 5));
         table.addCell(cell(valueOf(invoice.getId()), 9));
         table.addCell(cell("Rechnungsdatum", 4));
         table.addCell(cell(invoice.getDate().format(ofPattern("dd.MM.yyyy")), 8));
@@ -178,7 +200,7 @@ public class InvoicePdfGenerator {
         /*
          * REMOVE
          */
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 18; i++) {
 
             for (EffortJsonb effort : costs.getEfforts()) {
                 table.addCell(cell(effort.getPosition()));
