@@ -28,7 +28,7 @@ public class PdfPageNumberEvent extends PdfPageEventHelper {
         table.setLockedWidth(true);
         table.setHorizontalAlignment(ALIGN_CENTER);
         table.addCell(cell(format("Rechnung %d - Seite %d", id, writer.getCurrentPageNumber())));
-        table.writeSelectedRows(0, -1, document.left(), document.bottom(), writer.getDirectContent());
+        table.writeSelectedRows(0, -1, document.left(), 40, writer.getDirectContent());
     }
 
     private PdfPCell cell(String text) {
