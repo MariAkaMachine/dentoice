@@ -15,6 +15,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RestController
 @RequestMapping("/v1/invoices")
+@CrossOrigin
 public class InvoiceResource {
 
     private final InvoiceService service;

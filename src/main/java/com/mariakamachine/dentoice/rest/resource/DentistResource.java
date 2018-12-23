@@ -4,6 +4,7 @@ import com.mariakamachine.dentoice.data.entity.DentistEntity;
 import com.mariakamachine.dentoice.rest.dto.Dentist;
 import com.mariakamachine.dentoice.service.DentistService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,6 +17,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 @RestController
 @RequestMapping("/v1/dentists")
 @CrossOrigin
+@Validated
 public class DentistResource {
 
     private final DentistService service;

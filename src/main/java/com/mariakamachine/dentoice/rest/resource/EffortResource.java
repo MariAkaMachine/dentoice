@@ -16,6 +16,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RestController
 @RequestMapping("/v1/efforts")
+@CrossOrigin
 @Validated
 public class EffortResource {
 
