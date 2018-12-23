@@ -4,9 +4,9 @@ import com.mariakamachine.dentoice.data.entity.PatientEntity;
 import com.mariakamachine.dentoice.rest.dto.Patient;
 import com.mariakamachine.dentoice.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -16,6 +16,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RestController
 @RequestMapping("/v1/patients")
+@CrossOrigin
+@Validated
 public class PatientResource {
 
     private final PatientService service;
@@ -27,12 +29,12 @@ public class PatientResource {
 
     @PostMapping(path = "/create", consumes = APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(CREATED)
-    public PatientEntity create(@RequestBody @Valid Patient patient) {
+    public PatientEntity create(@RequestBody Patient patient) {
         return service.create(patient);
     }
 
     @PatchMapping(path = "/{id}", consumes = APPLICATION_JSON_UTF8_VALUE)
-    public PatientEntity update(@PathVariable Long id, @RequestBody @Valid Patient patient) {
+    public PatientEntity update(@PathVariable Long id, @RequestBody Patient patient) {
         return service.update(id, patient);
     }
 

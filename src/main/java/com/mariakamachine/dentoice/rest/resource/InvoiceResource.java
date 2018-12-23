@@ -5,9 +5,9 @@ import com.mariakamachine.dentoice.rest.dto.Invoice;
 import com.mariakamachine.dentoice.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -15,6 +15,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RestController
 @RequestMapping("/v1/invoices")
+@CrossOrigin
+@Validated
 public class InvoiceResource {
 
     private final InvoiceService service;
@@ -26,7 +28,7 @@ public class InvoiceResource {
 
     @PostMapping(path = "/create", consumes = APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(CREATED)
-    public InvoiceEntity create(@RequestBody @Valid Invoice invoice) {
+    public InvoiceEntity create(@RequestBody Invoice invoice) {
         return service.create(invoice);
     }
 
