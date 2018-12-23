@@ -56,7 +56,7 @@ public class InvoiceService {
         return new InvoicePdfGenerator().generatePdf(invoiceProperties, new InvoiceEntity());
     }
 
-    public byte[] getMonthlyPdf(Long dentistId, LocalDate from, LocalDate to) {
+    public byte[] getMonthlyPdf(LocalDate from, LocalDate to, Long dentistId) {
 //        DentistEntity dentist = dentistService.getById(dentistId);
         List<InvoiceEntity> invoices = invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to);
         return new InvoicePdfGenerator().generateMonthlyPdf(invoiceProperties, invoices);
