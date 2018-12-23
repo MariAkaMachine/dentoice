@@ -10,7 +10,6 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.DentistEntity;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
@@ -23,11 +22,8 @@ import static com.itextpdf.text.FontFactory.*;
 import static com.itextpdf.text.PageSize.A4;
 import static com.itextpdf.text.Rectangle.NO_BORDER;
 import static com.itextpdf.text.pdf.PdfWriter.getInstance;
-import static com.mariakamachine.dentoice.util.invoice.pdf.PdfInvoice.*;
-import static java.math.BigDecimal.ROUND_HALF_DOWN;
 
 @Slf4j
-@NoArgsConstructor
 public class InvoicePdfGenerator {
 
     static final Font DEFAULT_FONT = getFont(COURIER, 10);
@@ -40,8 +36,9 @@ public class InvoicePdfGenerator {
         try {
             PdfWriter writer = getInstance(pdf, stream);
             pdf.open();
-
-
+            writer.setPageEvent(new PdfPageNumberEvent(1L));
+            pdf.add(recipientDetails(invoices.get(0).getDentist()));
+            addTablesToPdf(pdf, writer, new MonthlyPdfInvoice().generateTables(invoiceProperties, invoices));
             pdf.close();
         } catch (DocumentException e) {
             log.error("unable to generate pdf invoice for monthly invoice", e);
@@ -68,16 +65,23 @@ public class InvoicePdfGenerator {
             writer.setPageEvent(new PdfPageNumberEvent(invoice.getId()));
 
             pdf.add(recipientDetails(invoice.getDentist()));
-            pdf.add(invoiceDetails(invoice));
-            pdf.add(costsTable(invoice.getCosts()));
-            PdfPTable footerDetails = footerDetails(invoiceProperties);
-            footerDetails.writeSelectedRows(0, -1, pdf.left(), footerDetails.getTotalHeight() + 45, writer.getDirectContent());
-
+            addTablesToPdf(pdf, writer, new PdfInvoice().generateTables(invoiceProperties, invoice));
             pdf.close();
         } catch (DocumentException e) {
             log.error("unable to generate pdf invoice for invoice {}", invoice.getId(), e);
         }
         return stream.toByteArray();
+    }
+
+    private void addTablesToPdf(Document pdf, PdfWriter writer, List<PdfPTable> tables) throws DocumentException {
+        int counter = 1;
+        for (PdfPTable table : tables) {
+            if (counter == table.size()) {
+                table.writeSelectedRows(0, -1, pdf.left(), table.getTotalHeight() + 45, writer.getDirectContent());
+            }
+            pdf.add(table);
+            counter++;
+        }
     }
 
     private PdfPTable recipientDetails(DentistEntity dentist) {
@@ -105,19 +109,6 @@ public class InvoicePdfGenerator {
         table.addCell(cell(dentist.getZip() + " " + dentist.getCity()));
 
         return table;
-    }
-
-
-    /*
-     * UTILS
-     */
-
-    static BigDecimal round(double sum) {
-        return round(new BigDecimal(sum));
-    }
-
-    static BigDecimal round(BigDecimal sum) {
-        return sum.setScale(2, ROUND_HALF_DOWN);
     }
 
     /*

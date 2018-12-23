@@ -2,6 +2,7 @@ package com.mariakamachine.dentoice.service;
 
 import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.CostWrapperEntity;
+import com.mariakamachine.dentoice.data.entity.DentistEntity;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
 import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
@@ -83,6 +84,14 @@ public class InvoiceService {
             costs.setEfforts(Collections.singletonList(effort));
             invoice.setCosts(costs);
             invoices.add(invoice);
+            DentistEntity dentist = new DentistEntity();
+            dentist.setTitle("Herr Zahnarzt");
+            dentist.setStreet("Leinenweberstr. 47");
+            dentist.setLastName("Bims");
+            dentist.setZip("70567");
+            dentist.setFirstName("Halo I");
+            dentist.setCity("Stuttgart");
+            invoice.setDentist(dentist);
         }
         return invoices;
     }

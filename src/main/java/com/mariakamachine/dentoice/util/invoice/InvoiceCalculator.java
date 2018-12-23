@@ -1,16 +1,21 @@
 package com.mariakamachine.dentoice.util.invoice;
 
 import com.mariakamachine.dentoice.data.entity.CostWrapperEntity;
+import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
 import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 
 import static java.math.BigDecimal.ROUND_HALF_DOWN;
 
-public class InvoiceSumCalculator {
+@Slf4j
+public class InvoiceCalculator {
 
-    public InvoiceSum calculate(CostWrapperEntity costs) {
+    public static InvoiceSum calculateInvoice(InvoiceEntity invoice) {
+        log.info("calculating costs for invoice {}", invoice.getId());
+        CostWrapperEntity costs = invoice.getCosts();
         // calc efforts
         BigDecimal efforts = new BigDecimal(0.0);
         for (EffortJsonb effort : costs.getEfforts()) {
@@ -30,7 +35,15 @@ public class InvoiceSumCalculator {
         return new InvoiceSum(round(efforts), round(materials), round(metals), round(efforts.add(materials)));
     }
 
-    private BigDecimal round(BigDecimal sum) {
+    public static BigDecimal calculateProduct(Double quantity, Double pricePerUnit) {
+        return round(new BigDecimal(quantity).multiply(new BigDecimal(pricePerUnit)));
+    }
+
+    public static BigDecimal calculatePercentage(BigDecimal sum, double percentage) {
+        return round(sum.multiply(new BigDecimal(percentage)).divide(new BigDecimal(100)));
+    }
+
+    private static BigDecimal round(BigDecimal sum) {
         return sum.setScale(2, ROUND_HALF_DOWN);
     }
 

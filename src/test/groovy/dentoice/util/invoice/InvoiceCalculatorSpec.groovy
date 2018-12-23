@@ -1,13 +1,15 @@
 package dentoice.util.invoice
 
 import com.mariakamachine.dentoice.data.entity.CostWrapperEntity
+import com.mariakamachine.dentoice.data.entity.InvoiceEntity
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb
 import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb
 import com.mariakamachine.dentoice.util.invoice.InvoiceSum
-import com.mariakamachine.dentoice.util.invoice.InvoiceSumCalculator
 import spock.lang.Specification
 
-class InvoiceSumCalculatorSpec extends Specification {
+import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateInvoice
+
+class InvoiceCalculatorSpec extends Specification {
 
     def "test correct invoice sum calculation"() {
         given:
@@ -19,10 +21,11 @@ class InvoiceSumCalculatorSpec extends Specification {
                 .map { data -> [position: "0", description: "dummy", quantity: data[0], pricePerUnit: data[1], isMetal: data[2]] as MaterialJsonb }
                 .toArray()
 
-        def costs = [efforts: efforts, materials: materials] as CostWrapperEntity
+        def invoice = new InvoiceEntity()
+        invoice.setCosts([efforts: efforts, materials: materials] as CostWrapperEntity)
 
         expect:
-        expected == new InvoiceSumCalculator().calculate(costs)
+        expected == calculateInvoice(invoice)
 
         where:
         effortsData                                        | materialsData                                                                    | expected
