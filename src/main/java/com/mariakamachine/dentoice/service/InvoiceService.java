@@ -14,6 +14,7 @@ import com.mariakamachine.dentoice.util.InvoicePdfGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +54,12 @@ public class InvoiceService {
     public byte[] getPdfById(Long id) {
 //        return new InvoicePdfGenerator().generatePdf(getById(id));
         return new InvoicePdfGenerator().generatePdf(invoiceProperties, new InvoiceEntity());
+    }
+
+    public byte[] getMonthlyPdf(Long dentistId, LocalDate from, LocalDate to) {
+//        DentistEntity dentist = dentistService.getById(dentistId);
+        List<InvoiceEntity> invoices = invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to);
+        return new InvoicePdfGenerator().generateMonthlyPdf(invoiceProperties, invoices);
     }
 
     // update

@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.itextpdf.text.Element.*;
 import static com.itextpdf.text.FontFactory.*;
@@ -44,6 +45,10 @@ public class InvoicePdfGenerator {
     private BigDecimal effortsSum = new BigDecimal(0.0);
     private BigDecimal materialsSum = new BigDecimal(0.0);
     private BigDecimal metalsSum = new BigDecimal(0.0);
+
+    public byte[] generateMonthlyPdf(InvoiceProperties invoiceProperties, List<InvoiceEntity> invoices) {
+        return null;
+    }
 
     public byte[] generatePdf(InvoiceProperties invoiceProperties, InvoiceEntity invoice) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
