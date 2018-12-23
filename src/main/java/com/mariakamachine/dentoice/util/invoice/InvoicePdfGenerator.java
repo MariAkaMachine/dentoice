@@ -1,4 +1,4 @@
-package com.mariakamachine.dentoice.util;
+package com.mariakamachine.dentoice.util.invoice;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;

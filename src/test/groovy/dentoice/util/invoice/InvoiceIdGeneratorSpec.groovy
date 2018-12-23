@@ -1,6 +1,6 @@
-package dentoice.util
+package dentoice.util.invoice
 
-import com.mariakamachine.dentoice.util.InvoiceIdGenerator
+import com.mariakamachine.dentoice.util.invoice.InvoiceIdGenerator
 import org.hibernate.engine.spi.SessionImplementor
 import spock.lang.Specification
 

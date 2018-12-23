@@ -1,4 +1,4 @@
-package com.mariakamachine.dentoice.util;
+package com.mariakamachine.dentoice.util.invoice;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.HibernateException;

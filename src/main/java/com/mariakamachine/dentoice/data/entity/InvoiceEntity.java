@@ -33,7 +33,7 @@ import static javax.persistence.FetchType.LAZY;
 public class InvoiceEntity implements Serializable {
 
     @Id
-    @GenericGenerator(name = "invoice_id", strategy = "com.mariakamachine.dentoice.util.InvoiceIdGenerator")
+    @GenericGenerator(name = "invoice_id", strategy = "com.mariakamachine.dentoice.util.invoice.InvoiceIdGenerator")
     @GeneratedValue(generator = "invoice_id")
     @Column(nullable = false, updatable = false, unique = true)
     private Long id;

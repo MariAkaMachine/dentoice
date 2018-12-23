@@ -1,4 +1,4 @@
-package com.mariakamachine.dentoice.util.xml;
+package com.mariakamachine.dentoice.util.invoice.xml;
 
 import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.CostWrapperEntity;

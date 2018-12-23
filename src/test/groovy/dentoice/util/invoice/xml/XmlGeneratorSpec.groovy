@@ -1,5 +1,4 @@
-package dentoice.util
-
+package dentoice.util.invoice.xml
 
 import com.mariakamachine.dentoice.config.properties.InvoiceProperties
 import com.mariakamachine.dentoice.data.entity.CostWrapperEntity
@@ -7,11 +6,11 @@ import com.mariakamachine.dentoice.data.entity.DentistEntity
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb
 import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb
-import com.mariakamachine.dentoice.util.xml.InvoiceConverter
-import com.mariakamachine.dentoice.util.xml.XmlGenerator
+import com.mariakamachine.dentoice.util.invoice.xml.InvoiceConverter
 import spock.lang.Specification
 
 import static com.google.common.io.Files.newReader
+import static com.mariakamachine.dentoice.util.invoice.xml.XmlGenerator.generateInvoiceXmlFile
 import static java.nio.charset.StandardCharsets.UTF_8
 import static java.time.LocalDate.of
 
@@ -40,7 +39,7 @@ class XmlGeneratorSpec extends Specification {
         ] as InvoiceEntity
 
         when:
-        File xmlFile = XmlGenerator.generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(invoice, properties))
+        File xmlFile = generateInvoiceXmlFile new InvoiceConverter().convertToXmlModel(invoice, properties)
 
         then:
         xmlFile.name == "${invoice.xmlNumber}.xml"

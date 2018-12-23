@@ -10,7 +10,7 @@ import com.mariakamachine.dentoice.exception.NotFoundException;
 import com.mariakamachine.dentoice.rest.dto.Effort;
 import com.mariakamachine.dentoice.rest.dto.Invoice;
 import com.mariakamachine.dentoice.rest.dto.Material;
-import com.mariakamachine.dentoice.util.InvoicePdfGenerator;
+import com.mariakamachine.dentoice.util.invoice.InvoicePdfGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

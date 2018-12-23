@@ -1,4 +1,4 @@
-package com.mariakamachine.dentoice.util.xml;
+package com.mariakamachine.dentoice.util.invoice.xml;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.time.LocalDate;

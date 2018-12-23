@@ -1,4 +1,4 @@
-package com.mariakamachine.dentoice.util.xml;
+package com.mariakamachine.dentoice.util.invoice.xml;
 
 import com.mariakamachine.dentoice.xml.Laborabrechnung;
 import lombok.extern.slf4j.Slf4j;

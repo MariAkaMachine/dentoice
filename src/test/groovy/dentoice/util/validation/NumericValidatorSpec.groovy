@@ -1,4 +1,4 @@
-package dentoice.util
+package dentoice.util.validation
 
 import com.mariakamachine.dentoice.util.validation.NumericValidator
 import spock.lang.Specification
