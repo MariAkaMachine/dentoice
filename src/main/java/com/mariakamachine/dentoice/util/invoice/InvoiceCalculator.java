@@ -7,13 +7,14 @@ import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static java.math.BigDecimal.ROUND_HALF_DOWN;
 
 @Slf4j
 public class InvoiceCalculator {
 
-    public static InvoiceSum calculateInvoice(InvoiceEntity invoice, double percentage) {
+    public static InvoiceSum calculateInvoice(InvoiceEntity invoice, double mwstPercentage) {
         log.info("calculating costs for invoice {}", invoice.getId());
         CostWrapperEntity costs = invoice.getCosts();
         // calc efforts
@@ -34,15 +35,27 @@ public class InvoiceCalculator {
         // netto
         BigDecimal netto = round(efforts.add(materials));
         // fraction
-        BigDecimal fraction = calculatePercentage(netto, percentage);
-        return new InvoiceSum(round(efforts), round(materials), round(metals), netto, fraction, netto.add(fraction));
+        BigDecimal mwst = calculatePercentage(netto, mwstPercentage);
+        return new InvoiceSum(round(efforts), round(materials), round(metals), netto, mwst, netto.add(mwst));
+    }
+
+    public static MonthlyInvoiceSum calculateMonthlyInvoiceSum(List<InvoiceEntity> invoices, double skontoPercentage, double mwstPercentage) {
+        BigDecimal subtotal = new BigDecimal(0.0);
+        BigDecimal efforts = new BigDecimal(0.0);
+        for (InvoiceEntity invoice : invoices) {
+            InvoiceSum invoiceSum = calculateInvoice(invoice, mwstPercentage);
+            subtotal = subtotal.add(invoiceSum.getBrutto());
+            efforts = efforts.add(invoiceSum.getEfforts());
+        }
+        BigDecimal skonto = calculatePercentage(efforts, skontoPercentage);
+        return new MonthlyInvoiceSum(round(subtotal), round(efforts), skonto, subtotal.subtract(skonto));
     }
 
     public static BigDecimal calculateProduct(Double quantity, Double pricePerUnit) {
         return round(new BigDecimal(quantity).multiply(new BigDecimal(pricePerUnit)));
     }
 
-    public static BigDecimal calculatePercentage(BigDecimal sum, double percentage) {
+    private static BigDecimal calculatePercentage(BigDecimal sum, double percentage) {
         return round(sum.multiply(new BigDecimal(percentage)).divide(new BigDecimal(100)));
     }
 

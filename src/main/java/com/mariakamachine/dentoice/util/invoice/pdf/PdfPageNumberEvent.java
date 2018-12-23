@@ -15,10 +15,12 @@ import static java.lang.String.format;
 
 public class PdfPageNumberEvent extends PdfPageEventHelper {
 
-    private Long id;
+    private String parameter;
+    private boolean isMonthly;
 
-    PdfPageNumberEvent(Long id) {
-        this.id = id;
+    PdfPageNumberEvent(String parameter, boolean isMonthly) {
+        this.parameter = parameter;
+        this.isMonthly = isMonthly;
     }
 
     @Override
@@ -27,7 +29,7 @@ public class PdfPageNumberEvent extends PdfPageEventHelper {
         table.setTotalWidth(A4.getWidth() - 100);
         table.setLockedWidth(true);
         table.setHorizontalAlignment(ALIGN_CENTER);
-        table.addCell(cell(format("Rechnung %d - Seite %d", id, writer.getCurrentPageNumber())));
+        table.addCell(cell(format(isMonthly ? "Monatsaufstellung %s - Seite %d" : "Rechnung %s - Seite %d", parameter, writer.getCurrentPageNumber())));
         table.writeSelectedRows(0, -1, document.left(), 40, writer.getDirectContent());
     }
 

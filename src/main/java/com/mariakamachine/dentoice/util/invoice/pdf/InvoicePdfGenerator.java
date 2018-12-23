@@ -22,13 +22,15 @@ import static com.itextpdf.text.FontFactory.*;
 import static com.itextpdf.text.PageSize.A4;
 import static com.itextpdf.text.Rectangle.NO_BORDER;
 import static com.itextpdf.text.pdf.PdfWriter.getInstance;
+import static java.lang.String.valueOf;
+import static java.time.format.DateTimeFormatter.ofPattern;
 
 @Slf4j
 public class InvoicePdfGenerator {
 
     static final Font DEFAULT_FONT = getFont(COURIER, 10);
     static final Font BOLD_FONT = getFont(COURIER_BOLD, 10);
-    static final Font SMALL_FONT = getFont(COURIER, 8);
+    private static final Font SMALL_FONT = getFont(COURIER, 8);
 
     public byte[] generateMonthlyPdf(InvoiceProperties invoiceProperties, List<InvoiceEntity> invoices) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -36,7 +38,7 @@ public class InvoicePdfGenerator {
         try {
             PdfWriter writer = getInstance(pdf, stream);
             pdf.open();
-            writer.setPageEvent(new PdfPageNumberEvent(1L));
+            writer.setPageEvent(new PdfPageNumberEvent(invoices.get(0).getDate().format(ofPattern("MM/yyyy")), true));
             pdf.add(recipientDetails(invoices.get(0).getDentist()));
             addTablesToPdf(pdf, writer, new MonthlyPdfInvoice().generateTables(invoiceProperties, invoices));
             pdf.close();
@@ -53,17 +55,7 @@ public class InvoicePdfGenerator {
         try {
             PdfWriter writer = getInstance(pdf, stream);
             pdf.open();
-
-            /*
-             * REMOVE
-             */
-            invoice.setId(18120137L);
-            /*
-             * REMOVE
-             */
-
-            writer.setPageEvent(new PdfPageNumberEvent(invoice.getId()));
-
+            writer.setPageEvent(new PdfPageNumberEvent(valueOf(invoice.getId()), false));
             pdf.add(recipientDetails(invoice.getDentist()));
             addTablesToPdf(pdf, writer, new PdfInvoice().generateTables(invoiceProperties, invoice));
             pdf.close();
@@ -76,10 +68,11 @@ public class InvoicePdfGenerator {
     private void addTablesToPdf(Document pdf, PdfWriter writer, List<PdfPTable> tables) throws DocumentException {
         int counter = 1;
         for (PdfPTable table : tables) {
-            if (counter == table.size()) {
+            if (counter == tables.size()) {
                 table.writeSelectedRows(0, -1, pdf.left(), table.getTotalHeight() + 45, writer.getDirectContent());
+            } else {
+                pdf.add(table);
             }
-            pdf.add(table);
             counter++;
         }
     }
@@ -171,10 +164,9 @@ public class InvoicePdfGenerator {
     }
 
     static void addFooterRow(PdfPTable table, String text, BigDecimal sum, Font font, int outerBorder, int innerBorder) {
-        table.addCell(cell(" ", outerBorder));
-        table.addCell(cell(" ", outerBorder));
-        table.addCell(cell(" ", outerBorder));
-        table.addCell(cell(" ", outerBorder));
+        PdfPCell blankCell = cell(" ", outerBorder);
+        blankCell.setColspan(4);
+        table.addCell(blankCell);
         PdfPCell textCell = cell(text, ALIGN_LEFT, font, outerBorder + innerBorder);
         textCell.setColspan(2);
         table.addCell(textCell);

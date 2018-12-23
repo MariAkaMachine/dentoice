@@ -25,7 +25,7 @@ public class InvoiceConverter {
 
     public Laborabrechnung convertToXmlModel(InvoiceEntity invoice, InvoiceProperties invoiceProperties) {
         double netto = calculateInvoiceNetto(invoice.getCosts());
-        double mwst = netto * invoiceProperties.getMwstInPercentage() / 100;
+        double mwst = netto * invoiceProperties.getMwstPercentage() / 100;
         double brutto = netto + mwst;
         // RECHNUNG
         Rechnung rechnung = new Rechnung();
@@ -39,7 +39,7 @@ public class InvoiceConverter {
         // MWST GRUPPE
         MwstGruppe mwstGruppe = new MwstGruppe();
         mwstGruppe.setNetto(convertToXsdConformInteger(netto));
-        mwstGruppe.setMwstSatz(convertToXsdConformInteger(invoiceProperties.getMwstInPercentage() / 10));
+        mwstGruppe.setMwstSatz(convertToXsdConformInteger(invoiceProperties.getMwstPercentage() / 10));
         mwstGruppe.setMwstBetrag(convertToXsdConformInteger(mwst));
         // POSITIONEN - EFFORT
         List<Position> positionen = new ArrayList<>();

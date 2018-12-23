@@ -9,13 +9,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class InvoiceSum {
+public class MonthlyInvoiceSum {
 
-    private BigDecimal efforts;
-    private BigDecimal materials;
-    private BigDecimal metal;
-    private BigDecimal netto;
-    private BigDecimal mwst;
-    private BigDecimal brutto;
+    BigDecimal subtotal;
+    BigDecimal efforts;
+    BigDecimal skonto;
+    BigDecimal total;
 
 }

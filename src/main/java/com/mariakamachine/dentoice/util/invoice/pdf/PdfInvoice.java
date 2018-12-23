@@ -5,15 +5,12 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.CostWrapperEntity;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
-import com.mariakamachine.dentoice.data.enums.InsuranceType;
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
 import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
 import com.mariakamachine.dentoice.util.invoice.InvoiceSum;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.itextpdf.text.Element.ALIGN_CENTER;
@@ -23,9 +20,9 @@ import static com.itextpdf.text.Rectangle.*;
 import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateInvoice;
 import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateProduct;
 import static com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator.*;
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.time.format.DateTimeFormatter.ofPattern;
-import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Slf4j
@@ -33,10 +30,10 @@ class PdfInvoice {
 
     public List<PdfPTable> generateTables(InvoiceProperties invoiceProperties, InvoiceEntity invoice) {
         List<PdfPTable> tables = new ArrayList<>();
-        InvoiceSum invoiceSum = calculateInvoice(invoice, invoiceProperties.getMwstInPercentage());
+        InvoiceSum invoiceSum = calculateInvoice(invoice, invoiceProperties.getMwstPercentage());
         tables.add(invoiceDetailsTable(invoice));
         tables.add(costsTable(invoice.getCosts(), invoiceSum));
-        tables.add(footerTable(invoiceSum));
+        tables.add(footerTable(invoiceProperties, invoiceSum));
         return tables;
     }
 
@@ -45,18 +42,6 @@ class PdfInvoice {
         PdfPTable table = new PdfPTable(2);
         table.setWidthPercentage(45);
         table.setHorizontalAlignment(ALIGN_RIGHT);
-
-        /*
-         * REMOVE
-         */
-        invoice.setId(2L);
-        invoice.setDate(LocalDate.now());
-        invoice.setDescription("24 Tele");
-        invoice.setPatient("Dieter MacAdam");
-        invoice.setInsuranceType(InsuranceType.PRIVATE);
-        /*
-         * REMOVE
-         */
 
         table.addCell(cell("Rechnungsnummer", 5));
         table.addCell(cell(valueOf(invoice.getId()), 9));
@@ -71,8 +56,6 @@ class PdfInvoice {
         table.addCell(cell("Zahnfarbe", 6));
         table.addCell(cell("gelb", 10));
 
-        table.setSpacingAfter(20);
-
         return table;
     }
 
@@ -81,42 +64,15 @@ class PdfInvoice {
         PdfPTable table = new PdfPTable(new float[]{2, 9, 2, 3, 3});
         table.setWidthPercentage(100);
         table.setHorizontalAlignment(ALIGN_CENTER);
+        table.setSpacingBefore(20);
         costsHeaderRow(table);
 
-        /*
-         * REMOVE
-         */
-        costs = new CostWrapperEntity();
-        EffortJsonb effortb = new EffortJsonb();
-        effortb.setPosition("1234");
-        effortb.setDescription("Desinfektion");
-        effortb.setQuantity(1.00);
-        effortb.setPricePerUnit(285.50);
-        costs.setEfforts(singletonList(effortb));
-        MaterialJsonb material2 = new MaterialJsonb();
-        material2.setPosition("7895");
-        material2.setDescription("PlatinLloyd 100");
-        material2.setNotes("BEGO Legierung CE ja");
-        material2.setQuantity(3.60);
-        material2.setPricePerUnit(51.25);
-        material2.setMetal(true);
-        MaterialJsonb material1 = new MaterialJsonb();
-        material1.setPosition("7895");
-        material1.setDescription("PlatinLloyd 100");
-        material1.setQuantity(3.60);
-        material1.setPricePerUnit(51.25);
-        costs.setMaterials(Arrays.asList(material1, material2));
-        for (int i = 0; i < 100; i++) {
-            /*
-             * REMOVE
-             */
-            for (EffortJsonb effort : costs.getEfforts()) {
-                table.addCell(cell(effort.getPosition()));
-                table.addCell(cell(effort.getDescription()));
-                table.addCell(cell(valueOf(effort.getQuantity())));
-                table.addCell(cellRight(valueOf(effort.getPricePerUnit())));
-                table.addCell(cellRight(calculateProduct(effort.getQuantity(), effort.getPricePerUnit()).toPlainString()));
-            }
+        for (EffortJsonb effort : costs.getEfforts()) {
+            table.addCell(cell(effort.getPosition()));
+            table.addCell(cell(effort.getDescription()));
+            table.addCell(cell(valueOf(effort.getQuantity())));
+            table.addCell(cellRight(valueOf(effort.getPricePerUnit())));
+            table.addCell(cellRight(calculateProduct(effort.getQuantity(), effort.getPricePerUnit()).toPlainString()));
         }
 
         for (MaterialJsonb material : costs.getMaterials()) {
@@ -158,7 +114,7 @@ class PdfInvoice {
         table.addCell(headerCellRight("Gesamtpreis"));
     }
 
-    private PdfPTable footerTable(InvoiceSum invoiceSum) {
+    private PdfPTable footerTable(InvoiceProperties invoiceProperties, InvoiceSum invoiceSum) {
         log.info("creating footer table");
         PdfPTable table = new PdfPTable(7);
         table.setTotalWidth(A4.getWidth() - 100);
@@ -171,7 +127,7 @@ class PdfInvoice {
         addFooterRow(table, "Material", invoiceSum.getMaterials(), DEFAULT_FONT, TOP, NO_BORDER);
         addFooterRow(table, "Leistung", invoiceSum.getEfforts(), DEFAULT_FONT, NO_BORDER, NO_BORDER);
         addFooterRow(table, "Netto", invoiceSum.getNetto(), DEFAULT_FONT, NO_BORDER, TOP);
-        addFooterRow(table, "Mehrwertsteuer (7.00%)", invoiceSum.getFraction(), DEFAULT_FONT, NO_BORDER, BOTTOM);
+        addFooterRow(table, format("Mehrwertsteuer (%s%%)", invoiceProperties.getMwstPercentage()), invoiceSum.getMwst(), DEFAULT_FONT, NO_BORDER, BOTTOM);
         addFooterRow(table, "Gesamtbetrag", invoiceSum.getBrutto(), BOLD_FONT, BOTTOM, NO_BORDER);
 
         table.addCell(fineCell("Umsatzsteuer-Identifikationsnummer DE239653548", table.getNumberOfColumns()));

@@ -4,6 +4,7 @@ import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.CostWrapperEntity;
 import com.mariakamachine.dentoice.data.entity.DentistEntity;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
+import com.mariakamachine.dentoice.data.enums.InsuranceType;
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
 import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
 import com.mariakamachine.dentoice.data.repository.InvoiceRepository;
@@ -15,8 +16,10 @@ import com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -55,7 +58,7 @@ public class InvoiceService {
 
     public byte[] getPdfById(Long id) {
 //        return new InvoicePdfGenerator().generatePdf(getById(id));
-        return new InvoicePdfGenerator().generatePdf(invoiceProperties, new InvoiceEntity());
+        return new InvoicePdfGenerator().generatePdf(invoiceProperties, invoices().get(7));
     }
 
     public byte[] getMonthlyPdf(LocalDate from, LocalDate to, Long dentistId) {
@@ -67,23 +70,40 @@ public class InvoiceService {
 
     List<InvoiceEntity> invoices() {
         List<InvoiceEntity> invoices = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 32; i++) {
             InvoiceEntity invoice = new InvoiceEntity();
-            invoice.setId(Long.valueOf("181200" + i));
-            invoice.setDate(LocalDate.parse("2018-12-" + i));
+            invoice.setId(Long.valueOf("1812000" + i));
+            invoice.setDate(LocalDate.now());
+            invoice.setDescription("24 Tele");
             invoice.setPatient("Patient Nummer " + i);
+            invoice.setInsuranceType(InsuranceType.PRIVATE);
             CostWrapperEntity costs = new CostWrapperEntity();
-            MaterialJsonb material = new MaterialJsonb();
-            material.setMetal(true);
-            material.setPricePerUnit(234.43);
-            material.setQuantity(Math.random() * i);
+
+            MaterialJsonb material2 = new MaterialJsonb();
+            material2.setPosition("7895");
+            material2.setDescription("PlatinLloyd 100");
+            material2.setNotes("BEGO Legierung CE ja");
+            material2.setQuantity(new BigDecimal(Math.random() * i).setScale(4, BigDecimal.ROUND_HALF_DOWN).doubleValue());
+            material2.setPricePerUnit(51.25);
+            material2.setMetal(true);
+
+            MaterialJsonb material1 = new MaterialJsonb();
+            material1.setPosition("7895");
+            material1.setDescription("PlatinLloyd 100");
+            material1.setQuantity(3.60);
+            material1.setPricePerUnit(51.25);
+            costs.setMaterials(Arrays.asList(material1, material2));
+
             EffortJsonb effort = new EffortJsonb();
+            effort.setPosition("1234");
+            effort.setDescription("Desinfektion");
             effort.setPricePerUnit(234.43);
-            effort.setQuantity(Math.random() * i);
-            costs.setMaterials(Collections.singletonList(material));
+            effort.setQuantity(new BigDecimal(Math.random() * i).setScale(4, BigDecimal.ROUND_HALF_DOWN).doubleValue());
+
             costs.setEfforts(Collections.singletonList(effort));
             invoice.setCosts(costs);
             invoices.add(invoice);
+
             DentistEntity dentist = new DentistEntity();
             dentist.setTitle("Herr Zahnarzt");
             dentist.setStreet("Leinenweberstr. 47");

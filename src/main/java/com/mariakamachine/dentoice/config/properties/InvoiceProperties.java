@@ -13,6 +13,7 @@ public class InvoiceProperties {
 
     private String xsdVersion;
     private String softwareVersion;
-    private Double mwstInPercentage;
+    private Double mwstPercentage;
+    private Double skontoPercentage;
 
 }
