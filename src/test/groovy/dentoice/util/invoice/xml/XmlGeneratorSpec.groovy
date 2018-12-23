@@ -25,7 +25,9 @@ class XmlGeneratorSpec extends Specification {
                 [position: "0001", description: "Modell aus Hartgips", quantity: 2.00, pricePerUnit: 8.08] as EffortJsonb
         ] as List
 
-        def materials = [[position: "9005", description: "PlatinLloyd 100", quantity: 3.6, pricePerUnit: 51.25, notes: "BEGO Legierung CE 4004"] as MaterialJsonb] as List
+        def materials = [
+                [position: "9005", description: "PlatinLloyd 100", quantity: 3.6, pricePerUnit: 51.25, notes: "BEGO Legierung CE 4004"] as MaterialJsonb
+        ] as List
 
         def invoice = [id           : 18031234,
                        dentist      : [id: 1, lastName: "Squarepants", street: "Pineapple", zip: "0815", city: "Bikini Bottom"] as DentistEntity,
