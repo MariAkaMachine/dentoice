@@ -13,7 +13,7 @@ import static java.math.BigDecimal.ROUND_HALF_DOWN;
 @Slf4j
 public class InvoiceCalculator {
 
-    public static InvoiceSum calculateInvoice(InvoiceEntity invoice) {
+    public static InvoiceSum calculateInvoice(InvoiceEntity invoice, double percentage) {
         log.info("calculating costs for invoice {}", invoice.getId());
         CostWrapperEntity costs = invoice.getCosts();
         // calc efforts
@@ -31,8 +31,11 @@ public class InvoiceCalculator {
             }
             materials = materials.add(materialCost);
         }
-        // total
-        return new InvoiceSum(round(efforts), round(materials), round(metals), round(efforts.add(materials)));
+        // netto
+        BigDecimal netto = round(efforts.add(materials));
+        // fraction
+        BigDecimal fraction = calculatePercentage(netto, percentage);
+        return new InvoiceSum(round(efforts), round(materials), round(metals), netto, fraction, netto.add(fraction));
     }
 
     public static BigDecimal calculateProduct(Double quantity, Double pricePerUnit) {

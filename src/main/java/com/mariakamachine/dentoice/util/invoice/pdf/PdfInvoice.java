@@ -11,7 +11,6 @@ import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
 import com.mariakamachine.dentoice.util.invoice.InvoiceSum;
 import lombok.extern.slf4j.Slf4j;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +20,8 @@ import static com.itextpdf.text.Element.ALIGN_CENTER;
 import static com.itextpdf.text.Element.ALIGN_RIGHT;
 import static com.itextpdf.text.PageSize.A4;
 import static com.itextpdf.text.Rectangle.*;
-import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.*;
+import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateInvoice;
+import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateProduct;
 import static com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator.*;
 import static java.lang.String.valueOf;
 import static java.time.format.DateTimeFormatter.ofPattern;
@@ -33,10 +33,10 @@ class PdfInvoice {
 
     public List<PdfPTable> generateTables(InvoiceProperties invoiceProperties, InvoiceEntity invoice) {
         List<PdfPTable> tables = new ArrayList<>();
-        InvoiceSum invoiceSum = calculateInvoice(invoice);
+        InvoiceSum invoiceSum = calculateInvoice(invoice, invoiceProperties.getMwstInPercentage());
         tables.add(invoiceDetailsTable(invoice));
         tables.add(costsTable(invoice.getCosts(), invoiceSum));
-        tables.add(footerTable(invoiceProperties, invoiceSum));
+        tables.add(footerTable(invoiceSum));
         return tables;
     }
 
@@ -158,7 +158,7 @@ class PdfInvoice {
         table.addCell(headerCellRight("Gesamtpreis"));
     }
 
-    private PdfPTable footerTable(InvoiceProperties invoiceProperties, InvoiceSum invoiceSum) {
+    private PdfPTable footerTable(InvoiceSum invoiceSum) {
         log.info("creating footer table");
         PdfPTable table = new PdfPTable(7);
         table.setTotalWidth(A4.getWidth() - 100);
@@ -170,10 +170,9 @@ class PdfInvoice {
 
         addFooterRow(table, "Material", invoiceSum.getMaterials(), DEFAULT_FONT, TOP, NO_BORDER);
         addFooterRow(table, "Leistung", invoiceSum.getEfforts(), DEFAULT_FONT, NO_BORDER, NO_BORDER);
-        addFooterRow(table, "Netto", invoiceSum.getTotal(), DEFAULT_FONT, NO_BORDER, TOP);
-        BigDecimal mwst = calculatePercentage(invoiceSum.getTotal(), invoiceProperties.getMwstInPercentage());
-        addFooterRow(table, "Mehrwertsteuer (7.00%)", mwst, DEFAULT_FONT, NO_BORDER, BOTTOM);
-        addFooterRow(table, "Gesamtbetrag", invoiceSum.getTotal().add(mwst), BOLD_FONT, BOTTOM, NO_BORDER);
+        addFooterRow(table, "Netto", invoiceSum.getNetto(), DEFAULT_FONT, NO_BORDER, TOP);
+        addFooterRow(table, "Mehrwertsteuer (7.00%)", invoiceSum.getFraction(), DEFAULT_FONT, NO_BORDER, BOTTOM);
+        addFooterRow(table, "Gesamtbetrag", invoiceSum.getBrutto(), BOLD_FONT, BOTTOM, NO_BORDER);
 
         table.addCell(fineCell("Umsatzsteuer-Identifikationsnummer DE239653548", table.getNumberOfColumns()));
 

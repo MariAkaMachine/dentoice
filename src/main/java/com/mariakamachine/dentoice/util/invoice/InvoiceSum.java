@@ -14,6 +14,8 @@ public class InvoiceSum {
     private BigDecimal efforts;
     private BigDecimal materials;
     private BigDecimal metal;
-    private BigDecimal total;
+    private BigDecimal netto;
+    private BigDecimal fraction;
+    private BigDecimal brutto;
 
 }
