@@ -3,7 +3,6 @@ package com.mariakamachine.dentoice.rest.resource;
 import com.mariakamachine.dentoice.data.entity.DentistEntity;
 import com.mariakamachine.dentoice.rest.dto.Dentist;
 import com.mariakamachine.dentoice.service.DentistService;
-import com.mariakamachine.dentoice.util.validation.Numeric;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,17 +33,17 @@ public class DentistResource {
     }
 
     @PatchMapping(path = "/{id}", consumes = APPLICATION_JSON_UTF8_VALUE)
-    public DentistEntity update(@PathVariable @Numeric Long id, @RequestBody Dentist dentist) {
+    public DentistEntity update(@PathVariable Long id, @RequestBody Dentist dentist) {
         return service.update(id, dentist);
     }
 
     @DeleteMapping(path = "/{id}")
-    public void delete(@PathVariable @Numeric Long id) {
+    public void delete(@PathVariable Long id) {
         service.delete(id);
     }
 
     @GetMapping(path = "/{id}", produces = APPLICATION_JSON_UTF8_VALUE)
-    public DentistEntity get(@PathVariable @Numeric Long id) {
+    public DentistEntity get(@PathVariable Long id) {
         return service.getById(id);
     }
 

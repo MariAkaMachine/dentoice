@@ -1,6 +1,5 @@
 package dentoice.rest.resource
 
-import com.google.common.collect.Lists
 import com.mariakamachine.dentoice.Application
 import com.mariakamachine.dentoice.data.entity.DentistEntity
 import com.mariakamachine.dentoice.data.repository.DentistRepository
@@ -8,14 +7,18 @@ import org.json.JSONArray
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Unroll
+
+import static com.google.common.collect.Lists.asList
+import static groovy.json.JsonOutput.toJson
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest(classes = [Application])
 @AutoConfigureMockMvc
@@ -37,13 +40,13 @@ class DentistResourceSpec extends Specification {
     @Unroll
     def "create dentists with several payload variations"() {
         expect:
-        mockMvc.perform(MockMvcRequestBuilders.post("/v1/dentists/create")
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+        mockMvc.perform(post("/v1/dentists/create")
+                .contentType(APPLICATION_JSON_UTF8_VALUE)
                 .content(payload))
-                .andExpect(MockMvcResultMatchers.status().is(response_status))
+                .andExpect(status().is(responseStatus))
 
         where:
-        payload                                                                                                                                                                                                    || response_status
+        payload                                                                                                                                                                                                    || responseStatus
         '{ "lastName": "Dentist", "street": "Panorama Boulevard", "zip": "CV0815", "city": "Sunshine State" }'                                                                                                     || 201
         '{ "id": "1", "lastName": "Dentist", "street": "Panorama Boulevard", "zip": "CV0815", "city": "Sunshine State" }'                                                                                          || 201
         '{ "title" :"Prof. Dr.", "firstName":"John", "lastName": "Snow", "street": "House Stark Rd 1", "zip": "WF 123", "city": "Winterfell", "phone": "123456789", "fax": "123456789", "email": "snow@got.com" }' || 201
@@ -56,8 +59,8 @@ class DentistResourceSpec extends Specification {
         def id = fillDbWithTestEntriesAndReturnIds(1)[0]
 
         expect:
-        mockMvc.perform(MockMvcRequestBuilders.patch("/v1/dentists/${id}")
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+        mockMvc.perform(patch("/v1/dentists/${id}")
+                .contentType(APPLICATION_JSON_UTF8_VALUE)
                 .content(
                 """
                   {
@@ -69,8 +72,8 @@ class DentistResourceSpec extends Specification {
                     "email": "robbie@got.com"
                   }
                 """))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(
+                .andExpect(status().isOk())
+                .andExpect(content().json(
                 """
                   {
                     "id": ${id},
@@ -90,8 +93,8 @@ class DentistResourceSpec extends Specification {
         def id = fillDbWithTestEntriesAndReturnIds(1)[0]
 
         when:
-        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/dentists/${id}"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        mockMvc.perform(delete("/v1/dentists/${id}"))
+                .andExpect(status().isOk())
 
         then:
         repository.findAll().size() == 0
@@ -104,9 +107,9 @@ class DentistResourceSpec extends Specification {
         def id = fillDbWithTestEntriesAndReturnIds(1)[0]
 
         expect:
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/dentists/${id}"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(
+        mockMvc.perform(get("/v1/dentists/${id}"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(
                 """
                   {
                     "id": ${id},
@@ -123,13 +126,13 @@ class DentistResourceSpec extends Specification {
         given:
         def data = [lastName: "Sqarepants", street: "124 Conch Street", zip: "Pacific Ocean", city: "Bikini Bottom"]
         def expectedData = [:] << ["id": repository.save(data as DentistEntity).id] << data
-        def expectedJson = groovy.json.JsonOutput.toJson Lists.asList(expectedData)
+        def expectedJson = toJson asList(expectedData)
 
         expect:
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/dentists")
+        mockMvc.perform(get("/v1/dentists")
                 .param("lastName", data.lastName))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(expectedJson))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedJson))
     }
 
     @Unroll
@@ -137,14 +140,14 @@ class DentistResourceSpec extends Specification {
         given:
         def data = [firstName: "Spongebob", lastName: "Sqarepants", street: "124 Conch Street", zip: "Pacific Ocean", city: "Bikini Bottom"]
         def expectedData = [:] << ["id": repository.save(data as DentistEntity).id] << data
-        def expectedJson = groovy.json.JsonOutput.toJson Lists.asList(expectedData)
+        def expectedJson = toJson asList(expectedData)
 
         expect:
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/dentists")
+        mockMvc.perform(get("/v1/dentists")
                 .param("firstName", data.firstName)
                 .param("lastName", data.lastName))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(expectedJson))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedJson))
     }
 
     @Unroll
@@ -154,8 +157,8 @@ class DentistResourceSpec extends Specification {
         fillDbWithTestEntriesAndReturnIds(entries)
 
         expect:
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/dentists"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        mockMvc.perform(get("/v1/dentists"))
+                .andExpect(status().isOk())
                 .andExpect({ assert new JSONArray(it.getResponse().getContentAsString()).length() == entries })
     }
 
