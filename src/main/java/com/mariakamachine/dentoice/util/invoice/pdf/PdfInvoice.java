@@ -1,117 +1,36 @@
-package com.mariakamachine.dentoice.util.invoice;
+package com.mariakamachine.dentoice.util.invoice.pdf;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.CostWrapperEntity;
-import com.mariakamachine.dentoice.data.entity.DentistEntity;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import com.mariakamachine.dentoice.data.enums.InsuranceType;
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
 import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
 
-import static com.itextpdf.text.Element.*;
-import static com.itextpdf.text.FontFactory.*;
+import static com.itextpdf.text.Element.ALIGN_CENTER;
+import static com.itextpdf.text.Element.ALIGN_RIGHT;
 import static com.itextpdf.text.PageSize.A4;
 import static com.itextpdf.text.Rectangle.*;
-import static com.itextpdf.text.pdf.PdfWriter.getInstance;
+import static com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator.*;
 import static java.lang.String.valueOf;
-import static java.math.BigDecimal.ROUND_HALF_DOWN;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-@Slf4j
-@NoArgsConstructor
-public class InvoicePdfGenerator {
+class PdfInvoice {
 
-    private static final Font DEFAULT_FONT = getFont(COURIER, 10);
-    private static final Font BOLD_FONT = getFont(COURIER_BOLD, 10);
-    private static final Font SMALL_FONT = getFont(COURIER, 8);
+    private static BigDecimal effortsSum = new BigDecimal(0.0);
+    private static BigDecimal materialsSum = new BigDecimal(0.0);
+    private static BigDecimal metalsSum = new BigDecimal(0.0);
 
-    private BigDecimal effortsSum = new BigDecimal(0.0);
-    private BigDecimal materialsSum = new BigDecimal(0.0);
-    private BigDecimal metalsSum = new BigDecimal(0.0);
 
-    public byte[] generateMonthlyPdf(InvoiceProperties invoiceProperties, List<InvoiceEntity> invoices) {
-        return null;
-    }
-
-    public byte[] generatePdf(InvoiceProperties invoiceProperties, InvoiceEntity invoice) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        Document pdf = new Document(A4, 50, 50, 110, 150);
-        pdf.addAuthor("Dentaltechnik Udo Baumann");
-        pdf.addCreator("Dentaltechnik Udo Baumann");
-        pdf.addTitle("1");
-        pdf.addCreationDate();
-        try {
-            PdfWriter writer = getInstance(pdf, stream);
-            pdf.open();
-
-            /*
-             * REMOVE
-             */
-            invoice.setId(18120137L);
-            /*
-             * REMOVE
-             */
-
-            writer.setPageEvent(new PdfPageNumberEvent(invoice.getId()));
-
-            pdf.add(recipientDetails(invoice.getDentist()));
-            pdf.add(invoiceDetails(invoice));
-            pdf.add(costsTable(invoice.getCosts()));
-            PdfPTable footerDetails = footerDetails(invoiceProperties);
-            footerDetails.writeSelectedRows(0, -1, pdf.left(), footerDetails.getTotalHeight() + 45, writer.getDirectContent());
-
-            pdf.close();
-        } catch (DocumentException e) {
-            log.error("unable to generate pdf invoice for invoice {}", invoice.getId(), e);
-        }
-        return stream.toByteArray();
-    }
-
-    private PdfPTable recipientDetails(DentistEntity dentist) {
-        PdfPTable table = new PdfPTable(1);
-        table.setWidthPercentage(50);
-        table.setHorizontalAlignment(ALIGN_LEFT);
-
-        /*
-         * REMOVE
-         */
-        dentist = new DentistEntity();
-        dentist.setTitle("Herr Zahnarzt");
-        dentist.setFirstName("Halo I");
-        dentist.setLastName("Bims");
-        dentist.setStreet("Leinenweberstr. 47");
-        dentist.setZip("70567");
-        dentist.setCity("Stuttgart");
-        /*
-         * REMOVE
-         */
-
-        table.addCell(cell(dentist.getTitle()));
-        table.addCell(cell(dentist.getFirstName() + " " + dentist.getLastName()));
-        table.addCell(cell(dentist.getStreet()));
-        table.addCell(cell(dentist.getZip() + " " + dentist.getCity()));
-
-        return table;
-    }
-
-    private PdfPTable invoiceDetails(InvoiceEntity invoice) {
+    static PdfPTable invoiceDetails(InvoiceEntity invoice) {
         PdfPTable table = new PdfPTable(2);
         table.setWidthPercentage(45);
         table.setHorizontalAlignment(ALIGN_RIGHT);
@@ -146,8 +65,7 @@ public class InvoicePdfGenerator {
         return table;
     }
 
-
-    private PdfPTable costsTable(CostWrapperEntity costs) {
+    static PdfPTable costsTable(CostWrapperEntity costs) {
         PdfPTable table = new PdfPTable(new float[]{2, 9, 2, 3, 3});
         table.setWidthPercentage(100);
         table.setHorizontalAlignment(ALIGN_CENTER);
@@ -227,7 +145,7 @@ public class InvoicePdfGenerator {
         return table;
     }
 
-    private void costsHeaderRow(PdfPTable table) {
+    private static void costsHeaderRow(PdfPTable table) {
         table.setHeaderRows(1);
         table.addCell(headerCell("Position"));
         table.addCell(headerCell("Zahntechnische Leistung"));
@@ -236,7 +154,7 @@ public class InvoicePdfGenerator {
         table.addCell(headerCellRight("Gesamtpreis"));
     }
 
-    private PdfPTable footerDetails(InvoiceProperties invoiceProperties) {
+    static PdfPTable footerDetails(InvoiceProperties invoiceProperties) {
         PdfPTable table = new PdfPTable(7);
         table.setTotalWidth(A4.getWidth() - 100);
         table.setLockedWidth(true);
@@ -257,88 +175,6 @@ public class InvoicePdfGenerator {
         table.addCell(fineCell("Umsatzsteuer-Identifikationsnummer DE239653548", table.getNumberOfColumns()));
 
         return table;
-    }
-
-    /*
-     * UTILS
-     */
-
-    private BigDecimal round(double sum) {
-        return round(new BigDecimal(sum));
-    }
-
-    private BigDecimal round(BigDecimal sum) {
-        return sum.setScale(2, ROUND_HALF_DOWN);
-    }
-
-    /*
-     * CELL FORMATTING
-     */
-
-    private PdfPCell headerCell(String text) {
-        return marginCell(text, ALIGN_LEFT);
-    }
-
-    private PdfPCell headerCellRight(String text) {
-        return marginCell(text, ALIGN_RIGHT);
-    }
-
-    private PdfPCell marginCell(String text, int alignment) {
-        PdfPCell cell = cell(text, alignment, DEFAULT_FONT, 3);
-        cell.setPaddingTop(5);
-        cell.setPaddingBottom(5);
-        return cell;
-    }
-
-    private PdfPCell cell(String text) {
-        return cell(text, ALIGN_LEFT, NO_BORDER);
-    }
-
-    private PdfPCell cellRight(String text) {
-        return cell(text, ALIGN_RIGHT, NO_BORDER);
-    }
-
-    private PdfPCell cell(String text, int border) {
-        return cell(text, ALIGN_LEFT, border);
-    }
-
-    private PdfPCell cell(String text, int alignment, int border) {
-        return cell(text, alignment, DEFAULT_FONT, border);
-    }
-
-    private PdfPCell fineCell(String text, int colSpan) {
-        PdfPCell cell = cell(text, ALIGN_LEFT, SMALL_FONT, NO_BORDER);
-        cell.setColspan(colSpan);
-        return cell;
-    }
-
-    private PdfPCell cell(String text, int alignment, Font font, int border) {
-        PdfPCell cell = new PdfPCell();
-        cell.setHorizontalAlignment(alignment);
-        cell.setPhrase(new Phrase(text, font));
-        cell.setBorder(border);
-        return cell;
-    }
-
-    /*
-     * ROW FORMATTING
-     */
-
-    private void addEmptyRow(PdfPTable table) {
-        PdfPCell cell = cell(" ");
-        cell.setColspan(table.getNumberOfColumns());
-        table.addCell(cell);
-    }
-
-    private void addFooterRow(PdfPTable table, String text, BigDecimal sum, Font font, int outerBorder, int innerBorder) {
-        table.addCell(cell(" ", outerBorder));
-        table.addCell(cell(" ", outerBorder));
-        table.addCell(cell(" ", outerBorder));
-        table.addCell(cell(" ", outerBorder));
-        PdfPCell textCell = cell(text, ALIGN_LEFT, font, outerBorder + innerBorder);
-        textCell.setColspan(2);
-        table.addCell(textCell);
-        table.addCell(cell(sum.toPlainString() + " €", ALIGN_RIGHT, font, outerBorder + innerBorder));
     }
 
 }

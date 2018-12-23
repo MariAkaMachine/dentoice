@@ -10,12 +10,13 @@ import com.mariakamachine.dentoice.exception.NotFoundException;
 import com.mariakamachine.dentoice.rest.dto.Effort;
 import com.mariakamachine.dentoice.rest.dto.Invoice;
 import com.mariakamachine.dentoice.rest.dto.Material;
-import com.mariakamachine.dentoice.util.invoice.InvoicePdfGenerator;
+import com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -59,7 +60,31 @@ public class InvoiceService {
     public byte[] getMonthlyPdf(LocalDate from, LocalDate to, Long dentistId) {
 //        DentistEntity dentist = dentistService.getById(dentistId);
         List<InvoiceEntity> invoices = invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to);
-        return new InvoicePdfGenerator().generateMonthlyPdf(invoiceProperties, invoices);
+        return new InvoicePdfGenerator().generateMonthlyPdf(invoiceProperties, invoices());
+    }
+
+
+    List<InvoiceEntity> invoices() {
+        List<InvoiceEntity> invoices = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            InvoiceEntity invoice = new InvoiceEntity();
+            invoice.setId(Long.valueOf("181200" + i));
+            invoice.setDate(LocalDate.parse("2018-12-" + i));
+            invoice.setPatient("Patient Nummer " + i);
+            CostWrapperEntity costs = new CostWrapperEntity();
+            MaterialJsonb material = new MaterialJsonb();
+            material.setMetal(true);
+            material.setPricePerUnit(234.43);
+            material.setQuantity(Math.random() * i);
+            EffortJsonb effort = new EffortJsonb();
+            effort.setPricePerUnit(234.43);
+            effort.setQuantity(Math.random() * i);
+            costs.setMaterials(Collections.singletonList(material));
+            costs.setEfforts(Collections.singletonList(effort));
+            invoice.setCosts(costs);
+            invoices.add(invoice);
+        }
+        return invoices;
     }
 
     // update
