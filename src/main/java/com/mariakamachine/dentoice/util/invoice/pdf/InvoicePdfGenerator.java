@@ -18,9 +18,11 @@ import java.util.List;
 
 import static com.itextpdf.text.Element.ALIGN_LEFT;
 import static com.itextpdf.text.Element.ALIGN_RIGHT;
-import static com.itextpdf.text.FontFactory.*;
+import static com.itextpdf.text.FontFactory.getFont;
 import static com.itextpdf.text.PageSize.A4;
 import static com.itextpdf.text.Rectangle.NO_BORDER;
+import static com.itextpdf.text.pdf.BaseFont.COURIER;
+import static com.itextpdf.text.pdf.BaseFont.COURIER_BOLD;
 import static com.itextpdf.text.pdf.PdfWriter.getInstance;
 import static java.lang.String.valueOf;
 import static java.time.format.DateTimeFormatter.ofPattern;
@@ -28,9 +30,9 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @Slf4j
 public class InvoicePdfGenerator {
 
-    static final Font DEFAULT_FONT = getFont(COURIER, 10);
-    static final Font BOLD_FONT = getFont(COURIER_BOLD, 10);
-    private static final Font SMALL_FONT = getFont(COURIER, 8);
+    static final Font DEFAULT_FONT = getFont(COURIER, 9);
+    static final Font BOLD_FONT = getFont(COURIER_BOLD, 9);
+    private static final Font SMALL_FONT = getFont(COURIER, 7);
 
     public byte[] generateMonthlyPdf(InvoiceProperties invoiceProperties, List<InvoiceEntity> invoices) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -81,20 +83,6 @@ public class InvoicePdfGenerator {
         PdfPTable table = new PdfPTable(1);
         table.setWidthPercentage(50);
         table.setHorizontalAlignment(ALIGN_LEFT);
-
-        /*
-         * REMOVE
-         */
-        dentist = new DentistEntity();
-        dentist.setTitle("Herr Zahnarzt");
-        dentist.setFirstName("Halo I");
-        dentist.setLastName("Bims");
-        dentist.setStreet("Leinenweberstr. 47");
-        dentist.setZip("70567");
-        dentist.setCity("Stuttgart");
-        /*
-         * REMOVE
-         */
 
         table.addCell(cell(dentist.getTitle()));
         table.addCell(cell(dentist.getFirstName() + " " + dentist.getLastName()));
