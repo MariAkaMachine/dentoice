@@ -24,7 +24,7 @@ public class XmlGenerator {
         File xmlFile = new File(format("%s.xml", laborabrechnung.getRechnung().getXmlNummer()));
         StringWriter writer = new StringWriter();
         try {
-            createMarshaller(Laborabrechnung.class).marshal(laborabrechnung, writer);
+            createLaborabrechnungMarshaller().marshal(laborabrechnung, writer);
             // OLD: com.google.common.io.Files.write(writer.toString(), xmlFile, UTF_8);
             asCharSink(xmlFile, UTF_8).write(writer.toString());
         } catch (IOException | JAXBException e) {
@@ -33,12 +33,12 @@ public class XmlGenerator {
         return xmlFile;
     }
 
-    private static Marshaller createMarshaller(Class clazz) {
+    private static Marshaller createLaborabrechnungMarshaller() {
         Marshaller marshaller;
         try {
-            marshaller = newInstance(clazz).createMarshaller();
+            marshaller = newInstance(Laborabrechnung.class).createMarshaller();
             marshaller.setProperty(JAXB_FORMATTED_OUTPUT, true);
-            marshaller.setProperty(JAXB_ENCODING, "UTF-8");
+            marshaller.setProperty(JAXB_ENCODING, UTF_8.displayName());
             marshaller.setProperty(JAXB_NO_NAMESPACE_SCHEMA_LOCATION, NO_NAMESPACE_SCHEMA_LOCATION);
         } catch (Exception e) {
             log.error("could not create xml marshaller");

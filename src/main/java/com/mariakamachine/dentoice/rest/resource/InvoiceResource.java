@@ -4,16 +4,22 @@ import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import com.mariakamachine.dentoice.rest.dto.Invoice;
 import com.mariakamachine.dentoice.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.time.LocalDate;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/v1/invoices")
@@ -39,14 +45,31 @@ public class InvoiceResource {
         return service.getById(id);
     }
 
-    @GetMapping(path = "/{id}/pdf", produces = APPLICATION_PDF_VALUE)
-    public byte[] getPdfById(@PathVariable Long id) {
-        return service.getPdfById(id);
+    @GetMapping(path = "/{id}/xml", produces = APPLICATION_OCTET_STREAM_VALUE)
+    @ResponseBody
+    public ResponseEntity<Resource> getXmlById(@PathVariable Long id) {
+        File xml = service.getXmlById(id);
+        return ok()
+                .header(CONTENT_DISPOSITION, "attachment; filename=\"" + xml.getName() + "\"")
+                .body(new FileSystemResource(xml));
     }
 
-    @GetMapping(path = "/from/{from}/to/{to}/dentists/{id}/pdf", produces = APPLICATION_PDF_VALUE)
-    public byte[] getByDentistId(@PathVariable @DateTimeFormat(iso = DATE) LocalDate from, @PathVariable @DateTimeFormat(iso = DATE) LocalDate to, @PathVariable Long id) {
-        return service.getMonthlyPdf(from, to, id);
+    @GetMapping(path = "/{id}/pdf", produces = APPLICATION_OCTET_STREAM_VALUE)
+    @ResponseBody
+    public ResponseEntity<Resource> getPdfById(@PathVariable Long id) {
+        File pdf = service.getPdfById(id);
+        return ok()
+                .header(CONTENT_DISPOSITION, "attachment; filename=\"" + pdf.getName() + "\"")
+                .body(new FileSystemResource(pdf));
+    }
+
+    @GetMapping(path = "/from/{from}/to/{to}/dentists/{id}/pdf", produces = APPLICATION_OCTET_STREAM_VALUE)
+    @ResponseBody
+    public ResponseEntity<Resource> getByDentistId(@PathVariable @DateTimeFormat(iso = DATE) LocalDate from, @PathVariable @DateTimeFormat(iso = DATE) LocalDate to, @PathVariable Long id) {
+        File pdf = service.getMonthlyPdf(from, to, id);
+        return ok()
+                .header(CONTENT_DISPOSITION, "attachment; filename=\"" + pdf.getName() + "\"")
+                .body(new FileSystemResource(pdf));
     }
 
 }

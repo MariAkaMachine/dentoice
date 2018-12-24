@@ -13,16 +13,16 @@ import com.mariakamachine.dentoice.rest.dto.Effort;
 import com.mariakamachine.dentoice.rest.dto.Invoice;
 import com.mariakamachine.dentoice.rest.dto.Material;
 import com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator;
+import com.mariakamachine.dentoice.util.invoice.xml.InvoiceConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+import static com.mariakamachine.dentoice.util.invoice.xml.XmlGenerator.generateInvoiceXmlFile;
 import static java.lang.String.format;
 
 @Service
@@ -56,15 +56,20 @@ public class InvoiceService {
         return invoiceRepository.findAllByDentistIdOrderByDate(id);
     }
 
-    public byte[] getPdfById(Long id) {
+    public File getXmlById(Long id) {
 //        return new InvoicePdfGenerator().generatePdf(getById(id));
-        return new InvoicePdfGenerator().generatePdf(invoiceProperties, invoices().get(7));
+        return generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(invoices().get(7), invoiceProperties));
     }
 
-    public byte[] getMonthlyPdf(LocalDate from, LocalDate to, Long dentistId) {
+    public File getPdfById(Long id) {
+//        return new InvoicePdfGenerator().generatePdf(getById(id));
+        return new InvoicePdfGenerator().generatePdf(invoices().get(7), invoiceProperties);
+    }
+
+    public File getMonthlyPdf(LocalDate from, LocalDate to, Long dentistId) {
 //        DentistEntity dentist = dentistService.getById(dentistId);
         List<InvoiceEntity> invoices = invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to);
-        return new InvoicePdfGenerator().generateMonthlyPdf(invoiceProperties, invoices());
+        return new InvoicePdfGenerator().generateMonthlyPdf(invoices(), invoiceProperties);
     }
 
 
@@ -75,6 +80,7 @@ public class InvoiceService {
             invoice.setId(Long.valueOf("1812000" + i));
             invoice.setDate(LocalDate.now());
             invoice.setDescription("24 Tele");
+            invoice.setXmlNumber(UUID.randomUUID().toString());
             invoice.setPatient("Patient Nummer " + i);
             invoice.setInsuranceType(InsuranceType.PRIVATE);
             CostWrapperEntity costs = new CostWrapperEntity();
