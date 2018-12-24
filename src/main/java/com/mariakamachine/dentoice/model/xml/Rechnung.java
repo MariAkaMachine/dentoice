@@ -1,4 +1,4 @@
-package com.mariakamachine.dentoice.xml;
+package com.mariakamachine.dentoice.model.xml;
 
 import com.mariakamachine.dentoice.util.invoice.xml.LocalDateXmlAdapter;
 import lombok.AllArgsConstructor;

@@ -5,18 +5,18 @@ import com.mariakamachine.dentoice.data.entity.CostWrapperEntity;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
 import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
-import com.mariakamachine.dentoice.xml.Laborabrechnung;
-import com.mariakamachine.dentoice.xml.MwstGruppe;
-import com.mariakamachine.dentoice.xml.Position;
-import com.mariakamachine.dentoice.xml.Rechnung;
+import com.mariakamachine.dentoice.model.xml.Laborabrechnung;
+import com.mariakamachine.dentoice.model.xml.MwstGruppe;
+import com.mariakamachine.dentoice.model.xml.Position;
+import com.mariakamachine.dentoice.model.xml.Rechnung;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mariakamachine.dentoice.xml.Art.BEL;
-import static com.mariakamachine.dentoice.xml.Art.MAT;
+import static com.mariakamachine.dentoice.model.xml.Art.BEL;
+import static com.mariakamachine.dentoice.model.xml.Art.MAT;
 import static java.math.BigDecimal.ROUND_HALF_DOWN;
 import static java.util.Collections.singletonList;
 
