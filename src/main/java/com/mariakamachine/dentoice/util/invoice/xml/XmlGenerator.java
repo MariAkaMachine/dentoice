@@ -1,15 +1,14 @@
 package com.mariakamachine.dentoice.util.invoice.xml;
 
+import com.mariakamachine.dentoice.model.FileResource;
 import com.mariakamachine.dentoice.model.xml.Laborabrechnung;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 
-import static com.google.common.io.Files.asCharSink;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.xml.bind.JAXBContext.newInstance;
@@ -20,17 +19,14 @@ public class XmlGenerator {
 
     private static final String NO_NAMESPACE_SCHEMA_LOCATION = "Laborabrechnungsdaten_(KZBV-VDZI-VDDS)_(V4-4).xsd";
 
-    public static File generateInvoiceXmlFile(Laborabrechnung laborabrechnung) {
-        File xmlFile = new File(format("%s.xml", laborabrechnung.getRechnung().getXmlNummer()));
+    public static FileResource generateInvoiceXmlFile(Laborabrechnung laborabrechnung) {
         StringWriter writer = new StringWriter();
         try {
             createLaborabrechnungMarshaller().marshal(laborabrechnung, writer);
-            // OLD: com.google.common.io.Files.write(writer.toString(), xmlFile, UTF_8);
-            asCharSink(xmlFile, UTF_8).write(writer.toString());
-        } catch (IOException | JAXBException e) {
+        } catch (JAXBException e) {
             log.error("could not generate xml file", e);
         }
-        return xmlFile;
+        return new FileResource(new ByteArrayResource(writer.toString().getBytes(UTF_8)), format("%s.xml", laborabrechnung.getRechnung().getXmlNummer()));
     }
 
     private static Marshaller createLaborabrechnungMarshaller() {

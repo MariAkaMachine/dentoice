@@ -46,7 +46,7 @@ dependencies {
     implementation 'org.postgresql:postgresql'
     implementation 'org.liquibase:liquibase-core'
     implementation 'org.apache.commons:commons-lang3:3.8.1'
-    implementation 'com.google.guava:guava:27.0-jre'
+//    implementation 'com.google.guava:guava:27.0-jre'
     implementation 'com.itextpdf:itextpdf:5.5.13'
     implementation 'org.yaml:snakeyaml:1.23'
 

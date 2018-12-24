@@ -9,9 +9,7 @@ import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb
 import com.mariakamachine.dentoice.util.invoice.xml.InvoiceConverter
 import spock.lang.Specification
 
-import static com.google.common.io.Files.newReader
 import static com.mariakamachine.dentoice.util.invoice.xml.XmlGenerator.generateInvoiceXmlFile
-import static java.nio.charset.StandardCharsets.UTF_8
 import static java.time.LocalDate.of
 
 class XmlGeneratorSpec extends Specification {
@@ -41,11 +39,11 @@ class XmlGeneratorSpec extends Specification {
         ] as InvoiceEntity
 
         when:
-        File xmlFile = generateInvoiceXmlFile new InvoiceConverter().convertToXmlModel(invoice, properties)
+        def xmlResource = generateInvoiceXmlFile new InvoiceConverter().convertToXmlModel(invoice, properties)
 
         then:
-        xmlFile.name == "${invoice.xmlNumber}.xml"
-        newReader(xmlFile, UTF_8).text ==
+        xmlResource.fileName == "${invoice.xmlNumber}.xml"
+        xmlResource.resource.inputStream.newReader().text ==
                 '''\
                 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
                 <Laborabrechnung Version="4.0" xsi:noNamespaceSchemaLocation="Laborabrechnungsdaten_(KZBV-VDZI-VDDS)_(V4-4).xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -58,9 +56,6 @@ class XmlGeneratorSpec extends Specification {
                     </Rechnung>
                 </Laborabrechnung>
                 '''.stripIndent()
-
-        cleanup:
-        xmlFile.delete()
     }
 
 }

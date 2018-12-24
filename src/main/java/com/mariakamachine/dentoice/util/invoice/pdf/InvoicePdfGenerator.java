@@ -10,11 +10,11 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.DentistEntity;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
+import com.mariakamachine.dentoice.model.FileResource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -37,38 +37,37 @@ public class InvoicePdfGenerator {
     static final Font BOLD_FONT = getFont(COURIER_BOLD, 9);
     private static final Font SMALL_FONT = getFont(COURIER, 7);
 
-    public File generateMonthlyPdf(List<InvoiceEntity> invoices, InvoiceProperties invoiceProperties) {
+    public FileResource generateMonthlyPdf(List<InvoiceEntity> invoices, InvoiceProperties invoiceProperties) {
         final String pdfName = invoices.get(0).getDate().format(ofPattern("MM_yyyy"));
-        File pdfFile = new File(format("%s - %s.pdf", invoices.get(0).getDentist().getLastName(), pdfName));
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
         Document pdf = new Document(A4, 50, 50, 110, 150);
         try {
-            PdfWriter writer = getInstance(pdf, new FileOutputStream(pdfFile));
+            PdfWriter writer = getInstance(pdf, stream);
             pdf.open();
             writer.setPageEvent(new PdfPageNumberEvent(pdfName, true));
             pdf.add(recipientDetails(invoices.get(0).getDentist()));
             addTablesToPdf(pdf, writer, new MonthlyPdfInvoice().generateTables(invoiceProperties, invoices));
             pdf.close();
-        } catch (IOException | DocumentException e) {
+        } catch (DocumentException e) {
             log.error("unable to generate pdf invoice for monthly invoice", e);
         }
-        return pdfFile;
-
+        return new FileResource(new ByteArrayResource(stream.toByteArray()), format("%s - %s.pdf", invoices.get(0).getDentist().getLastName(), pdfName));
     }
 
-    public File generatePdf(InvoiceEntity invoice, InvoiceProperties invoiceProperties) {
-        File pdfFile = new File(format("%s.pdf", invoice.getId()));
+    public FileResource generatePdf(InvoiceEntity invoice, InvoiceProperties invoiceProperties) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
         Document pdf = new Document(A4, 50, 50, 110, 150);
         try {
-            PdfWriter writer = getInstance(pdf, new FileOutputStream(pdfFile));
+            PdfWriter writer = getInstance(pdf, stream);
             pdf.open();
             writer.setPageEvent(new PdfPageNumberEvent(valueOf(invoice.getId()), false));
             pdf.add(recipientDetails(invoice.getDentist()));
             addTablesToPdf(pdf, writer, new PdfInvoice().generateTables(invoiceProperties, invoice));
             pdf.close();
-        } catch (IOException | DocumentException e) {
+        } catch (DocumentException e) {
             log.error("unable to generate pdf invoice for invoice {}", invoice.getId(), e);
         }
-        return pdfFile;
+        return new FileResource(new ByteArrayResource(stream.toByteArray()), format("%s.pdf", invoice.getId()));
     }
 
     private void addTablesToPdf(Document pdf, PdfWriter writer, List<PdfPTable> tables) throws DocumentException {

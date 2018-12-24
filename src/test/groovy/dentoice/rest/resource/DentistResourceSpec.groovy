@@ -13,8 +13,8 @@ import spock.lang.Specification
 import spock.lang.Title
 import spock.lang.Unroll
 
-import static com.google.common.collect.Lists.asList
 import static groovy.json.JsonOutput.toJson
+import static org.codehaus.groovy.runtime.InvokerHelper.asList
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content

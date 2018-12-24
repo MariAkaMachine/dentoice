@@ -9,6 +9,7 @@ import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
 import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
 import com.mariakamachine.dentoice.data.repository.InvoiceRepository;
 import com.mariakamachine.dentoice.exception.NotFoundException;
+import com.mariakamachine.dentoice.model.FileResource;
 import com.mariakamachine.dentoice.rest.dto.Effort;
 import com.mariakamachine.dentoice.rest.dto.Invoice;
 import com.mariakamachine.dentoice.rest.dto.Material;
@@ -17,7 +18,6 @@ import com.mariakamachine.dentoice.util.invoice.xml.InvoiceConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
@@ -56,17 +56,17 @@ public class InvoiceService {
         return invoiceRepository.findAllByDentistIdOrderByDate(id);
     }
 
-    public File getXmlById(Long id) {
-//        return new InvoicePdfGenerator().generatePdf(getById(id));
+    public FileResource getXmlById(Long id) {
+//        return generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(getById(id), invoiceProperties));
         return generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(invoices().get(7), invoiceProperties));
     }
 
-    public File getPdfById(Long id) {
+    public FileResource getPdfById(Long id) {
 //        return new InvoicePdfGenerator().generatePdf(getById(id));
         return new InvoicePdfGenerator().generatePdf(invoices().get(7), invoiceProperties);
     }
 
-    public File getMonthlyPdf(LocalDate from, LocalDate to, Long dentistId) {
+    public FileResource getMonthlyPdf(LocalDate from, LocalDate to, Long dentistId) {
 //        DentistEntity dentist = dentistService.getById(dentistId);
         List<InvoiceEntity> invoices = invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to);
         return new InvoicePdfGenerator().generateMonthlyPdf(invoices(), invoiceProperties);
