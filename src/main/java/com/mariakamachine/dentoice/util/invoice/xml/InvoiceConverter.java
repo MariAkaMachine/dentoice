@@ -1,7 +1,6 @@
 package com.mariakamachine.dentoice.util.invoice.xml;
 
 import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
-import com.mariakamachine.dentoice.data.entity.CostWrapperEntity;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
 import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
@@ -9,7 +8,7 @@ import com.mariakamachine.dentoice.model.xml.Laborabrechnung;
 import com.mariakamachine.dentoice.model.xml.MwstGruppe;
 import com.mariakamachine.dentoice.model.xml.Position;
 import com.mariakamachine.dentoice.model.xml.Rechnung;
-import lombok.NoArgsConstructor;
+import com.mariakamachine.dentoice.util.invoice.InvoiceSum;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -17,30 +16,29 @@ import java.util.List;
 
 import static com.mariakamachine.dentoice.model.xml.Art.BEL;
 import static com.mariakamachine.dentoice.model.xml.Art.MAT;
+import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateInvoice;
+import static java.lang.Integer.valueOf;
 import static java.math.BigDecimal.ROUND_HALF_DOWN;
 import static java.util.Collections.singletonList;
 
-@NoArgsConstructor
 public class InvoiceConverter {
 
     public Laborabrechnung convertToXmlModel(InvoiceEntity invoice, InvoiceProperties invoiceProperties) {
-        double netto = calculateInvoiceNetto(invoice.getCosts());
-        double mwst = netto * invoiceProperties.getMwstPercentage() / 100;
-        double brutto = netto + mwst;
+        InvoiceSum invoiceSum = calculateInvoice(invoice, invoiceProperties.getMwstPercentage());
         // RECHNUNG
         Rechnung rechnung = new Rechnung();
         rechnung.setLaborSoftwareVersion(invoiceProperties.getSoftwareVersion());
         rechnung.setLaborLieferDatum(invoice.getDate());
         rechnung.setLaborRechnungsNummer(invoice.getId());
         rechnung.setXmlNummer(invoice.getXmlNumber());
-        rechnung.setNetto(convertToXsdConformInteger(netto));
-        rechnung.setMwst(convertToXsdConformInteger(mwst));
-        rechnung.setBrutto(convertToXsdConformInteger(brutto));
+        rechnung.setNetto(convertToXsdConformInteger(invoiceSum.getNetto()));
+        rechnung.setMwst(convertToXsdConformInteger(invoiceSum.getMwst()));
+        rechnung.setBrutto(convertToXsdConformInteger(invoiceSum.getBrutto()));
         // MWST GRUPPE
         MwstGruppe mwstGruppe = new MwstGruppe();
-        mwstGruppe.setNetto(convertToXsdConformInteger(netto));
+        mwstGruppe.setNetto(convertToXsdConformInteger(invoiceSum.getNetto()));
         mwstGruppe.setMwstSatz(convertToXsdConformInteger(invoiceProperties.getMwstPercentage() / 10));
-        mwstGruppe.setMwstBetrag(convertToXsdConformInteger(mwst));
+        mwstGruppe.setMwstBetrag(convertToXsdConformInteger(invoiceSum.getMwst()));
         // POSITIONEN - EFFORT
         List<Position> positionen = new ArrayList<>();
         for (EffortJsonb effort : invoice.getCosts().getEfforts()) {
@@ -64,19 +62,12 @@ public class InvoiceConverter {
         return new Position(MAT, null, material.getDescription(), convertToXsdConformInteger(material.getPricePerUnit()), convertToXsdConformInteger(material.getQuantity() * 10));
     }
 
-    private double calculateInvoiceNetto(CostWrapperEntity costs) {
-        double result = 0;
-        for (EffortJsonb effort : costs.getEfforts()) {
-            result += effort.getQuantity() * effort.getPricePerUnit();
-        }
-        for (MaterialJsonb material : costs.getMaterials()) {
-            result += material.getQuantity() * material.getPricePerUnit();
-        }
-        return result;
+    private int convertToXsdConformInteger(BigDecimal sum) {
+        return valueOf(sum.toPlainString().replace(".", ""));
     }
 
     private int convertToXsdConformInteger(double sum) {
-        return Integer.valueOf(new BigDecimal(sum)
+        return valueOf(new BigDecimal(sum)
                 .setScale(2, ROUND_HALF_DOWN)
                 .toPlainString()
                 .replace(".", ""));
