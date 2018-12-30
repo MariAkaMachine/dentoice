@@ -47,6 +47,8 @@ class PdfInvoice {
         table.addCell(cell(valueOf(invoice.getId()), 9));
         table.addCell(cell("Rechnungsdatum", 4));
         table.addCell(cell(invoice.getDate().format(ofPattern("dd.MM.yyyy")), 8));
+        table.addCell(cell("XML-Nummer", 4));
+        table.addCell(cell(invoice.getXmlNumber(), 8));
         table.addCell(cell("Art der Arbeit", 4));
         table.addCell(cell(invoice.getDescription(), 8));
         table.addCell(cell("Patient", 4));
@@ -54,7 +56,8 @@ class PdfInvoice {
         table.addCell(cell("Kassenart", 4));
         table.addCell(cell(invoice.getInsuranceType().toString(), 8));
         table.addCell(cell("Zahnfarbe", 6));
-        table.addCell(cell("gelb", 10));
+        String zahnfarbe = "";
+        table.addCell(cell(zahnfarbe, 10));
 
         return table;
     }

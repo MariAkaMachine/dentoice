@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RestController
@@ -38,6 +39,7 @@ public class EffortResource {
     }
 
     @DeleteMapping(path = "/{position}")
+    @ResponseStatus(NO_CONTENT)
     public void delete(@PathVariable @Numeric String position) {
         service.delete(position);
     }

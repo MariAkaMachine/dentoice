@@ -38,7 +38,7 @@ public class InvoicePdfGenerator {
     private static final Font SMALL_FONT = getFont(COURIER, 7);
 
     public FileResource generateMonthlyPdf(List<InvoiceEntity> invoices, InvoiceProperties invoiceProperties) {
-        final String pdfName = invoices.get(0).getDate().format(ofPattern("MM_yyyy"));
+        final String pdfName = invoices.get(0).getDate().format(ofPattern("MM/yyyy"));
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         Document pdf = new Document(A4, 50, 50, 110, 150);
         try {

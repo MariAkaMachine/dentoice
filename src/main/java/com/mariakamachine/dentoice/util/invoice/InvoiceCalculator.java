@@ -45,7 +45,7 @@ public class InvoiceCalculator {
         for (InvoiceEntity invoice : invoices) {
             InvoiceSum invoiceSum = calculateInvoice(invoice, mwstPercentage);
             subtotal = subtotal.add(invoiceSum.getBrutto());
-            efforts = efforts.add(invoiceSum.getEfforts());
+            efforts = efforts.add(invoiceSum.getEfforts().add(calculatePercentage(invoiceSum.getEfforts(), mwstPercentage)));
         }
         BigDecimal skonto = calculatePercentage(efforts, skontoPercentage);
         return new MonthlyInvoiceSum(round(subtotal), round(efforts), skonto, subtotal.subtract(skonto));

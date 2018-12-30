@@ -33,7 +33,7 @@ class XmlGeneratorSpec extends Specification {
                        description  : "36 VG-Krone",
                        xmlNumber    : "617200-F7357-KB-66399-2044-2",
                        invoiceType  : "INVOICE",
-                       insuranceType: "PUBLIC",
+                       insuranceType: "KASSE",
                        date         : of(2018, 03, 13),
                        costs        : [efforts: efforts, materials: materials] as CostWrapperEntity
         ] as InvoiceEntity

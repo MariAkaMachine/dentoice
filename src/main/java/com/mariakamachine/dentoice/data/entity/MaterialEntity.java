@@ -36,14 +36,14 @@ public class MaterialEntity implements Serializable {
         this.position = material.getPosition();
         this.name = material.getName();
         this.pricePerUnit = material.getPricePerUnit();
-        this.isMetal = material.isMetal();
+        this.isMetal = material.getIsMetal();
     }
 
     public MaterialEntity updateEntity(Material material) {
         this.position = material.getPosition();
         this.name = material.getName();
         this.pricePerUnit = material.getPricePerUnit();
-        this.isMetal = material.isMetal();
+        this.isMetal = material.getIsMetal();
         return this;
     }
 

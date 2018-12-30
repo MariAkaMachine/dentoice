@@ -12,14 +12,14 @@ import javax.validation.constraints.NotBlank;
 public class Material {
 
     @Numeric
-    String position;
+    private String position;
     @NotBlank
-    String name;
-    String notes;
+    private String name;
+    private String notes;
     @Min(0)
-    Double quantity;
+    private Double quantity;
     @Min(0)
-    Double pricePerUnit;
-    boolean isMetal;
+    private Double pricePerUnit;
+    private Boolean isMetal;
 
 }

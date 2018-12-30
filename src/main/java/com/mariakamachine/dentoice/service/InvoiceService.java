@@ -85,18 +85,15 @@ public class InvoiceService {
     }
 
     public FileResource getXmlById(long id) {
-//        return generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(getById(id), invoiceProperties));
-        return generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(invoices().get(7), invoiceProperties));
+        return generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(getById(id), invoiceProperties));
     }
 
     public FileResource getPdfById(long id) {
-//        return new InvoicePdfGenerator().generatePdf(getById(id));
-        return new InvoicePdfGenerator().generatePdf(invoices().get(7), invoiceProperties);
+        return new InvoicePdfGenerator().generatePdf(getById(id), invoiceProperties);
     }
 
     public FileResource getMonthlyPdf(LocalDate from, LocalDate to, long dentistId) {
-//        return new InvoicePdfGenerator().generateMonthlyPdf(invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to), invoiceProperties);
-        return new InvoicePdfGenerator().generateMonthlyPdf(invoices(), invoiceProperties);
+        return new InvoicePdfGenerator().generateMonthlyPdf(invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to), invoiceProperties);
     }
 
 
@@ -109,7 +106,7 @@ public class InvoiceService {
             invoice.setDescription("24 Tele");
             invoice.setXmlNumber(UUID.randomUUID().toString());
             invoice.setPatient("Patient Nummer " + i);
-            invoice.setInsuranceType(InsuranceType.PRIVATE);
+            invoice.setInsuranceType(InsuranceType.PRIVAT);
             CostWrapperEntity costs = new CostWrapperEntity();
 
             MaterialJsonb material2 = new MaterialJsonb();
