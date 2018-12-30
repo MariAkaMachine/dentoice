@@ -26,19 +26,17 @@ public class DentistService {
     }
 
     public DentistEntity update(long id, Dentist dentist) {
-        DentistEntity entity = repository.findById(id)
-                                       .orElseThrow(() -> new NotFoundException(format("could not find dentist with [ id: %d ]", id)));
-        return repository.save(entity.updateEntity(dentist));
+        return repository.save(getById(id)
+                .updateEntity(dentist));
     }
 
     public void delete(long id) {
-        // TODO must not delete if ID in invoices
         repository.deleteById(id);
     }
 
     public DentistEntity getById(long id) {
         return repository.findById(id)
-                       .orElseThrow(() -> new NotFoundException(format("could not find dentist with [ id: %d ]", id)));
+                .orElseThrow(() -> new NotFoundException(format("could not find dentist with [ id: %d ]", id)));
     }
 
     public List<DentistEntity> getByLastName(String lastName) {

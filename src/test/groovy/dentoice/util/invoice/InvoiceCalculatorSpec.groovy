@@ -14,11 +14,11 @@ class InvoiceCalculatorSpec extends Specification {
     def "test correct invoice sum calculation"() {
         given:
         def efforts = effortsData.stream()
-                .map { data -> [position: "0", description: "dummy", quantity: data[0], pricePerUnit: data[1]] as EffortJsonb }
+                .map { data -> [position: "0", name: "dummy", quantity: data[0], pricePerUnit: data[1]] as EffortJsonb }
                 .toArray()
 
         def materials = materialsData.stream()
-                .map { data -> [position: "0", description: "dummy", quantity: data[0], pricePerUnit: data[1], isMetal: data[2]] as MaterialJsonb }
+                .map { data -> [position: "0", name: "dummy", quantity: data[0], pricePerUnit: data[1], isMetal: data[2]] as MaterialJsonb }
                 .toArray()
 
         def invoice = new InvoiceEntity()

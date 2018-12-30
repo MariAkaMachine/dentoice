@@ -3,6 +3,7 @@ package dentoice.rest.resource
 import com.mariakamachine.dentoice.Application
 import com.mariakamachine.dentoice.data.entity.DentistEntity
 import com.mariakamachine.dentoice.data.repository.DentistRepository
+import com.mariakamachine.dentoice.service.InvoiceService
 import org.json.JSONArray
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -31,6 +32,9 @@ class DentistResourceSpec extends Specification {
 
     @Autowired
     private DentistRepository repository
+
+    @Autowired
+    private InvoiceService invoiceService
 
     void setup() {
         repository.flush()
@@ -94,7 +98,7 @@ class DentistResourceSpec extends Specification {
 
         when:
         mockMvc.perform(delete("/v1/dentists/${id}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
 
         then:
         repository.findAll().size() == 0

@@ -10,9 +10,7 @@ import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
 import com.mariakamachine.dentoice.data.repository.InvoiceRepository;
 import com.mariakamachine.dentoice.exception.NotFoundException;
 import com.mariakamachine.dentoice.model.FileResource;
-import com.mariakamachine.dentoice.rest.dto.Effort;
 import com.mariakamachine.dentoice.rest.dto.Invoice;
-import com.mariakamachine.dentoice.rest.dto.Material;
 import com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator;
 import com.mariakamachine.dentoice.util.invoice.xml.InvoiceConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,7 @@ import java.util.*;
 
 import static com.mariakamachine.dentoice.util.invoice.xml.XmlGenerator.generateInvoiceXmlFile;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class InvoiceService {
@@ -44,7 +43,32 @@ public class InvoiceService {
     }
 
     public InvoiceEntity create(Invoice invoice) {
-        return invoiceRepository.save(createInvoiceEntity(invoice));
+        InvoiceEntity entity = new InvoiceEntity();
+        entity.setDentist(dentistService.getById(invoice.getDentist()));
+        entity.setPatient(invoice.getPatient());
+        entity.setDescription(invoice.getDescription());
+        // TODO check for xml number duplicate for dentist
+        entity.setXmlNumber(invoice.getXmlNumber());
+        entity.setInvoiceType(invoice.getInvoiceType());
+        entity.setInsuranceType(invoice.getInsuranceType());
+        entity.setDate(invoice.getDate());
+        List<EffortJsonb> effortJsonbList = invoice.getEfforts().stream()
+                .map(effort -> new EffortJsonb(effort, effortService.getByPosition(effort.getPosition())))
+                .collect(toList());
+        List<MaterialJsonb> materialJsonbList = invoice.getMaterials().stream()
+                .map(material -> new MaterialJsonb(material, materialService.getByPosition(material.getPosition())))
+                .collect(toList());
+        entity.setCosts(new CostWrapperEntity(effortJsonbList, materialJsonbList));
+        return invoiceRepository.save(entity);
+    }
+
+    public InvoiceEntity update(long id, Invoice invoice) {
+        return invoiceRepository.save(getById(id)
+                .updateEntity(invoice, dentistService.getById(id)));
+    }
+
+    public void delete(long id) {
+        invoiceRepository.deleteById(id);
     }
 
     public InvoiceEntity getById(long id) {
@@ -52,28 +76,31 @@ public class InvoiceService {
                 .orElseThrow(() -> new NotFoundException(format("could not find invoice with [ id: %d ]", id)));
     }
 
-    public List<InvoiceEntity> getAllByDentistId(long id) {
-        return invoiceRepository.findAllByDentistIdOrderByDate(id);
+    public List<InvoiceEntity> getAll(long dentistId) {
+        if (dentistId == -1) {
+            return invoiceRepository.findAll();
+        } else {
+            return invoiceRepository.findAllByDentistIdOrderByDateAsc(dentistId);
+        }
     }
 
-    public FileResource getXmlById(Long id) {
+    public FileResource getXmlById(long id) {
 //        return generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(getById(id), invoiceProperties));
         return generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(invoices().get(7), invoiceProperties));
     }
 
-    public FileResource getPdfById(Long id) {
+    public FileResource getPdfById(long id) {
 //        return new InvoicePdfGenerator().generatePdf(getById(id));
         return new InvoicePdfGenerator().generatePdf(invoices().get(7), invoiceProperties);
     }
 
-    public FileResource getMonthlyPdf(LocalDate from, LocalDate to, Long dentistId) {
-//        DentistEntity dentist = dentistService.getById(dentistId);
-        List<InvoiceEntity> invoices = invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to);
+    public FileResource getMonthlyPdf(LocalDate from, LocalDate to, long dentistId) {
+//        return new InvoicePdfGenerator().generateMonthlyPdf(invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to), invoiceProperties);
         return new InvoicePdfGenerator().generateMonthlyPdf(invoices(), invoiceProperties);
     }
 
 
-    List<InvoiceEntity> invoices() {
+    private List<InvoiceEntity> invoices() {
         List<InvoiceEntity> invoices = new ArrayList<>();
         for (int i = 0; i < 32; i++) {
             InvoiceEntity invoice = new InvoiceEntity();
@@ -87,7 +114,7 @@ public class InvoiceService {
 
             MaterialJsonb material2 = new MaterialJsonb();
             material2.setPosition("7895");
-            material2.setDescription("PlatinLloyd 100");
+            material2.setName("PlatinLloyd 100");
             material2.setNotes("BEGO Legierung CE ja");
             material2.setQuantity(new BigDecimal(Math.random() * i).setScale(4, BigDecimal.ROUND_HALF_DOWN).doubleValue());
             material2.setPricePerUnit(51.25);
@@ -95,14 +122,14 @@ public class InvoiceService {
 
             MaterialJsonb material1 = new MaterialJsonb();
             material1.setPosition("7895");
-            material1.setDescription("PlatinLloyd 100");
+            material1.setName("PlatinLloyd 100");
             material1.setQuantity(3.60);
             material1.setPricePerUnit(51.25);
             costs.setMaterials(Arrays.asList(material1, material2));
 
             EffortJsonb effort = new EffortJsonb();
             effort.setPosition("1234");
-            effort.setDescription("Desinfektion");
+            effort.setName("Desinfektion");
             effort.setPricePerUnit(234.43);
             effort.setQuantity(new BigDecimal(Math.random() * i).setScale(4, BigDecimal.ROUND_HALF_DOWN).doubleValue());
 
@@ -120,37 +147,6 @@ public class InvoiceService {
             invoice.setDentist(dentist);
         }
         return invoices;
-    }
-
-    // update
-
-    // delete
-
-    // get all
-
-    private InvoiceEntity createInvoiceEntity(Invoice invoice) {
-        InvoiceEntity entity = new InvoiceEntity();
-        // get dentist by id
-        entity.setDentist(dentistService.getById(invoice.getDentist()));
-        entity.setPatient(invoice.getPatient());
-        entity.setDescription(invoice.getDescription());
-        // TODO check for xml number duplicate for dentist
-        entity.setXmlNumber(invoice.getXmlNumber());
-        entity.setInvoiceType(invoice.getInvoiceType());
-        entity.setInsuranceType(invoice.getInsuranceType());
-        entity.setDate(invoice.getDate());
-        // complete efforts
-        List<EffortJsonb> effortJsonbList = new ArrayList<>();
-        for (Effort effort : invoice.getEfforts()) {
-            effortJsonbList.add(new EffortJsonb(effort, effortService.getByPosition(effort.getPosition())));
-        }
-        // complete materials
-        List<MaterialJsonb> materialJsonbList = new ArrayList<>();
-        for (Material material : invoice.getMaterials()) {
-            materialJsonbList.add(new MaterialJsonb(material, materialService.getByPosition(material.getPosition())));
-        }
-        entity.setCosts(new CostWrapperEntity(effortJsonbList, materialJsonbList));
-        return entity;
     }
 
 }

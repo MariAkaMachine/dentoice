@@ -55,11 +55,11 @@ public class InvoiceConverter {
     }
 
     private Position effortToPosition(EffortJsonb effort) {
-        return new Position(BEL, effort.getPosition(), effort.getDescription(), convertToXsdConformInteger(effort.getPricePerUnit()), effort.getQuantity().intValue());
+        return new Position(BEL, effort.getPosition(), effort.getName(), convertToXsdConformInteger(effort.getPricePerUnit()), effort.getQuantity().intValue());
     }
 
     private Position materialToPosition(MaterialJsonb material) {
-        return new Position(MAT, null, material.getDescription(), convertToXsdConformInteger(material.getPricePerUnit()), convertToXsdConformInteger(material.getQuantity() * 10));
+        return new Position(MAT, null, material.getName(), convertToXsdConformInteger(material.getPricePerUnit()), convertToXsdConformInteger(material.getQuantity() * 10));
     }
 
     private int convertToXsdConformInteger(BigDecimal sum) {

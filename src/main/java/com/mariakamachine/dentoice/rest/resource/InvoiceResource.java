@@ -12,10 +12,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
@@ -37,6 +39,17 @@ public class InvoiceResource {
     @ResponseStatus(CREATED)
     public InvoiceEntity create(@RequestBody Invoice invoice) {
         return service.create(invoice);
+    }
+
+    @PatchMapping(path = "/{id}", consumes = APPLICATION_JSON_UTF8_VALUE)
+    public InvoiceEntity update(@PathVariable Long id, @RequestBody Invoice invoice) {
+        return service.update(id, invoice);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    @ResponseStatus(NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
     }
 
     @GetMapping(path = "/{id}", produces = APPLICATION_JSON_UTF8_VALUE)
@@ -62,13 +75,23 @@ public class InvoiceResource {
                 .body(pdfResource.getResource());
     }
 
-    @GetMapping(path = "/from/{from}/to/{to}/dentists/{id}/pdf", produces = APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(path = "/from/{from}/to/{to}/pdf", params = {"dentist"}, produces = APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
-    public ResponseEntity<Resource> getByDentistId(@PathVariable @DateTimeFormat(iso = DATE) LocalDate from, @PathVariable @DateTimeFormat(iso = DATE) LocalDate to, @PathVariable Long id) {
-        FileResource monthlyPdfResource = service.getMonthlyPdf(from, to, id);
+    public ResponseEntity<Resource> getByDentistId(@PathVariable @DateTimeFormat(iso = DATE) LocalDate from, @PathVariable @DateTimeFormat(iso = DATE) LocalDate to, @RequestParam Long dentist) {
+        FileResource monthlyPdfResource = service.getMonthlyPdf(from, to, dentist);
         return ok()
                 .header(CONTENT_DISPOSITION, "attachment; filename=\"" + monthlyPdfResource.getFileName() + "\"")
                 .body(monthlyPdfResource.getResource());
+    }
+
+    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
+    public List<InvoiceEntity> getAll() {
+        return service.getAll(-1L);
+    }
+
+    @GetMapping(params = {"dentist"}, produces = APPLICATION_JSON_UTF8_VALUE)
+    public List<InvoiceEntity> getAll(@RequestParam Long dentist) {
+        return service.getAll(dentist);
     }
 
 }

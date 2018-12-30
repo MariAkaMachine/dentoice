@@ -21,7 +21,7 @@ public class EffortJsonb implements Serializable {
     @Numeric
     private String position;
     @NotBlank
-    private String description;
+    private String name;
     @NotNull
     @Min(0)
     private Double quantity;
@@ -29,9 +29,16 @@ public class EffortJsonb implements Serializable {
     @Min(0)
     private Double pricePerUnit;
 
+    public EffortJsonb(Effort effort) {
+        this.position = effort.getPosition();
+        this.name = effort.getName();
+        this.quantity = effort.getQuantity();
+        this.pricePerUnit = effort.getPricePerUnit();
+    }
+
     public EffortJsonb(Effort effort, EffortEntity entity) {
         this.position = effort.getPosition();
-        this.description = isBlank(effort.getName()) ? entity.getName() : effort.getName();
+        this.name = isBlank(effort.getName()) ? entity.getName() : effort.getName();
         this.quantity = effort.getQuantity();
         this.pricePerUnit = effort.getPricePerUnit() == null ? entity.getPricePerUnit() : effort.getPricePerUnit();
     }

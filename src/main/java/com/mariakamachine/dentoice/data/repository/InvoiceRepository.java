@@ -16,7 +16,7 @@ public interface InvoiceRepository extends JpaRepository<InvoiceEntity, Long> {
     Optional<InvoiceEntity> findById(long id);
 
     @Transactional(readOnly = true)
-    List<InvoiceEntity> findAllByDentistIdOrderByDate(long id);
+    List<InvoiceEntity> findAllByDentistIdOrderByDateAsc(long id);
 
     @Transactional(readOnly = true)
     List<InvoiceEntity> findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(long id, LocalDate from, LocalDate to);

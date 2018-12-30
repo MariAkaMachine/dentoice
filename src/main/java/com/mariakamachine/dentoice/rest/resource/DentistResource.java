@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RestController
@@ -38,6 +39,7 @@ public class DentistResource {
     }
 
     @DeleteMapping(path = "/{id}")
+    @ResponseStatus(NO_CONTENT)
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }

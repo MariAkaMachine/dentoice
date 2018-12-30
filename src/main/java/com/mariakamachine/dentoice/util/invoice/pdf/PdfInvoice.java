@@ -69,7 +69,7 @@ class PdfInvoice {
 
         for (EffortJsonb effort : costs.getEfforts()) {
             table.addCell(cell(effort.getPosition()));
-            table.addCell(cell(effort.getDescription()));
+            table.addCell(cell(effort.getName()));
             table.addCell(cell(valueOf(effort.getQuantity())));
             table.addCell(cellRight(valueOf(effort.getPricePerUnit())));
             table.addCell(cellRight(calculateProduct(effort.getQuantity(), effort.getPricePerUnit()).toPlainString()));
@@ -77,7 +77,7 @@ class PdfInvoice {
 
         for (MaterialJsonb material : costs.getMaterials()) {
             table.addCell(cell(material.getPosition()));
-            String description = material.getDescription();
+            String description = material.getName();
             if (isNotBlank(material.getNotes())) {
                 description += "\n ";
                 description += material.getNotes();

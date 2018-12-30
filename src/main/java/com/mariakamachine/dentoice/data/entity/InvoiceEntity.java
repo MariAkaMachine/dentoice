@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mariakamachine.dentoice.config.postgres.CostWrapperEntityJsonbUserType;
 import com.mariakamachine.dentoice.data.enums.InsuranceType;
 import com.mariakamachine.dentoice.data.enums.InvoiceType;
+import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
+import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
+import com.mariakamachine.dentoice.rest.dto.Invoice;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
@@ -18,8 +21,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
+import static java.util.stream.Collectors.toList;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 
@@ -62,5 +67,23 @@ public class InvoiceEntity implements Serializable {
     private LocalDate date;
     @Type(type = "CostWrapperEntityJsonbUserType")
     private CostWrapperEntity costs;
+
+    public InvoiceEntity updateEntity(Invoice invoice, DentistEntity dentist) {
+        this.dentist = dentist;
+        this.patient = invoice.getPatient();
+        this.description = invoice.getDescription();
+        this.xmlNumber = invoice.getXmlNumber();
+        this.invoiceType = invoice.getInvoiceType();
+        this.insuranceType = invoice.getInsuranceType();
+        this.date = invoice.getDate();
+        List<EffortJsonb> effortJsonbList = invoice.getEfforts().stream()
+                .map(EffortJsonb::new)
+                .collect(toList());
+        List<MaterialJsonb> materialJsonbList = invoice.getMaterials().stream()
+                .map(MaterialJsonb::new)
+                .collect(toList());
+        this.costs = new CostWrapperEntity(effortJsonbList, materialJsonbList);
+        return this;
+    }
 
 }
