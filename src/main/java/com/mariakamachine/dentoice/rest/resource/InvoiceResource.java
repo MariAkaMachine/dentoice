@@ -1,19 +1,25 @@
 package com.mariakamachine.dentoice.rest.resource;
 
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
+import com.mariakamachine.dentoice.exception.NotFoundException;
 import com.mariakamachine.dentoice.model.FileResource;
 import com.mariakamachine.dentoice.rest.dto.Invoice;
 import com.mariakamachine.dentoice.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
+import static java.lang.String.format;
+import static org.springframework.data.domain.Sort.by;
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -84,14 +90,20 @@ public class InvoiceResource {
                 .body(monthlyPdfResource.getResource());
     }
 
-    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
-    public List<InvoiceEntity> getAll() {
-        return service.getAll(-1L);
+    @GetMapping(params = {"page", "size"}, produces = APPLICATION_JSON_UTF8_VALUE)
+    public PagedResources<InvoiceEntity> getAll(int page, int size, PagedResourcesAssembler assembler) {
+        return getAll(-1L, page, size, assembler);
     }
 
-    @GetMapping(params = {"dentist"}, produces = APPLICATION_JSON_UTF8_VALUE)
-    public List<InvoiceEntity> getAll(@RequestParam Long dentist) {
-        return service.getAll(dentist);
+    @GetMapping(params = {"dentistId", "page", "size"}, produces = APPLICATION_JSON_UTF8_VALUE)
+    @SuppressWarnings("unchecked")
+    public PagedResources<InvoiceEntity> getAll(@RequestParam Long dentistId, int page, int size, PagedResourcesAssembler assembler) {
+        PageRequest pageRequest = new PageRequest(page, size, by("date").ascending());
+        Page<InvoiceEntity> pageR = service.getAll(dentistId, pageRequest);
+        if (page > pageR.getTotalPages()) {
+            throw new NotFoundException(format("could not find any invoices for page %d with size %d", page, size));
+        }
+        return assembler.toResource(pageR);
     }
 
 }

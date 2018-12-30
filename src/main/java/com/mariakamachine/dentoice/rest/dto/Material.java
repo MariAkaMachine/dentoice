@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @Data
@@ -20,6 +21,7 @@ public class Material {
     private Double quantity;
     @Min(0)
     private Double pricePerUnit;
+    @NotNull
     private Boolean isMetal;
 
 }

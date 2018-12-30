@@ -30,7 +30,7 @@ public class MaterialEntity implements Serializable {
     private Double pricePerUnit;
     @NotNull
     @Column(name = "is_metal")
-    private boolean isMetal;
+    private Boolean isMetal;
 
     public MaterialEntity(Material material) {
         this.position = material.getPosition();

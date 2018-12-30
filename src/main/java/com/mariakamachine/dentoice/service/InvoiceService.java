@@ -14,6 +14,8 @@ import com.mariakamachine.dentoice.rest.dto.Invoice;
 import com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator;
 import com.mariakamachine.dentoice.util.invoice.xml.InvoiceConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -76,11 +78,11 @@ public class InvoiceService {
                 .orElseThrow(() -> new NotFoundException(format("could not find invoice with [ id: %d ]", id)));
     }
 
-    public List<InvoiceEntity> getAll(long dentistId) {
+    public Page<InvoiceEntity> getAll(long dentistId, Pageable pageable) {
         if (dentistId == -1) {
-            return invoiceRepository.findAll();
+            return invoiceRepository.findAll(pageable);
         } else {
-            return invoiceRepository.findAllByDentistIdOrderByDateAsc(dentistId);
+            return invoiceRepository.findAllByDentistId(dentistId, pageable);
         }
     }
 
