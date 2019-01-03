@@ -54,7 +54,7 @@ public class InvoicePdfGenerator {
         return new FileResource(new ByteArrayResource(stream.toByteArray()), format("%s - %s.pdf", invoices.get(0).getDentist().getLastName(), pdfName));
     }
 
-    public FileResource generatePdf(InvoiceEntity invoice, InvoiceProperties invoiceProperties) {
+    public FileResource generatePdf(InvoiceEntity invoice) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         Document pdf = new Document(A4, 50, 50, 110, 150);
         try {
@@ -62,7 +62,7 @@ public class InvoicePdfGenerator {
             pdf.open();
             writer.setPageEvent(new PdfPageNumberEvent(valueOf(invoice.getId()), false));
             pdf.add(recipientDetails(invoice.getDentist()));
-            addTablesToPdf(pdf, writer, new PdfInvoice().generateTables(invoiceProperties, invoice));
+            addTablesToPdf(pdf, writer, new PdfInvoice().generateTables(invoice));
             pdf.close();
         } catch (DocumentException e) {
             log.error("unable to generate pdf invoice for invoice {}", invoice.getId(), e);

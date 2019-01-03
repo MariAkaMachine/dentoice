@@ -25,6 +25,7 @@ public class Invoice {
     String patient;
     @NotBlank
     String description;
+    @NotBlank
     String xmlNumber;
     @NotNull
     InvoiceType invoiceType;
@@ -32,6 +33,9 @@ public class Invoice {
     InsuranceType insuranceType;
     @DateTimeFormat(iso = DATE)
     LocalDate date;
+    @NotNull
+    @Min(0)
+    Integer mwst;
     @NotNull
     List<Effort> efforts;
     @NotNull

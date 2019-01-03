@@ -14,7 +14,7 @@ import static java.math.BigDecimal.ROUND_HALF_DOWN;
 @Slf4j
 public class InvoiceCalculator {
 
-    public static InvoiceSum calculateInvoice(InvoiceEntity invoice, double mwstPercentage) {
+    public static InvoiceSum calculateInvoice(InvoiceEntity invoice) {
         log.info("calculating costs for invoice {}", invoice.getId());
         CostWrapperEntity costs = invoice.getCosts();
         // calc efforts
@@ -35,17 +35,17 @@ public class InvoiceCalculator {
         // netto
         BigDecimal netto = round(efforts.add(materials));
         // fraction
-        BigDecimal mwst = calculatePercentage(netto, mwstPercentage);
+        BigDecimal mwst = calculatePercentage(netto, invoice.getMwst());
         return new InvoiceSum(round(efforts), round(materials), round(metals), netto, mwst, netto.add(mwst));
     }
 
-    public static MonthlyInvoiceSum calculateMonthlyInvoiceSum(List<InvoiceEntity> invoices, double skontoPercentage, double mwstPercentage) {
+    public static MonthlyInvoiceSum calculateMonthlyInvoiceSum(List<InvoiceEntity> invoices, double skontoPercentage) {
         BigDecimal subtotal = new BigDecimal(0.0);
         BigDecimal efforts = new BigDecimal(0.0);
         for (InvoiceEntity invoice : invoices) {
-            InvoiceSum invoiceSum = calculateInvoice(invoice, mwstPercentage);
+            InvoiceSum invoiceSum = calculateInvoice(invoice);
             subtotal = subtotal.add(invoiceSum.getBrutto());
-            efforts = efforts.add(invoiceSum.getEfforts().add(calculatePercentage(invoiceSum.getEfforts(), mwstPercentage)));
+            efforts = efforts.add(invoiceSum.getEfforts().add(calculatePercentage(invoiceSum.getEfforts(), invoice.getMwst())));
         }
         BigDecimal skonto = calculatePercentage(efforts, skontoPercentage);
         return new MonthlyInvoiceSum(round(subtotal), round(efforts), skonto, subtotal.subtract(skonto));

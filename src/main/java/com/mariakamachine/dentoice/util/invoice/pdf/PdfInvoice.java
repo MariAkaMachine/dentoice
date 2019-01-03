@@ -2,7 +2,6 @@ package com.mariakamachine.dentoice.util.invoice.pdf;
 
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.CostWrapperEntity;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
@@ -28,12 +27,12 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @Slf4j
 class PdfInvoice {
 
-    public List<PdfPTable> generateTables(InvoiceProperties invoiceProperties, InvoiceEntity invoice) {
+    public List<PdfPTable> generateTables(InvoiceEntity invoice) {
         List<PdfPTable> tables = new ArrayList<>();
-        InvoiceSum invoiceSum = calculateInvoice(invoice, invoiceProperties.getMwstPercentage());
+        InvoiceSum invoiceSum = calculateInvoice(invoice);
         tables.add(invoiceDetailsTable(invoice));
         tables.add(costsTable(invoice.getCosts(), invoiceSum));
-        tables.add(footerTable(invoiceProperties, invoiceSum));
+        tables.add(footerTable(invoice, invoiceSum));
         return tables;
     }
 
@@ -117,7 +116,7 @@ class PdfInvoice {
         table.addCell(headerCellRight("Gesamtpreis"));
     }
 
-    private PdfPTable footerTable(InvoiceProperties invoiceProperties, InvoiceSum invoiceSum) {
+    private PdfPTable footerTable(InvoiceEntity invoice, InvoiceSum invoiceSum) {
         log.info("creating footer table");
         PdfPTable table = new PdfPTable(7);
         table.setTotalWidth(A4.getWidth() - 100);
@@ -130,7 +129,7 @@ class PdfInvoice {
         addFooterRow(table, "Material", invoiceSum.getMaterials(), DEFAULT_FONT, TOP, NO_BORDER);
         addFooterRow(table, "Leistung", invoiceSum.getEfforts(), DEFAULT_FONT, NO_BORDER, NO_BORDER);
         addFooterRow(table, "Netto", invoiceSum.getNetto(), DEFAULT_FONT, NO_BORDER, TOP);
-        addFooterRow(table, format("Mehrwertsteuer (%s%%)", invoiceProperties.getMwstPercentage()), invoiceSum.getMwst(), DEFAULT_FONT, NO_BORDER, BOTTOM);
+        addFooterRow(table, format("Mehrwertsteuer (%s%%)", invoice.getMwst()), invoiceSum.getMwst(), DEFAULT_FONT, NO_BORDER, BOTTOM);
         addFooterRow(table, "Gesamtbetrag", invoiceSum.getBrutto(), BOLD_FONT, BOTTOM, NO_BORDER);
 
         table.addCell(fineCell("Umsatzsteuer-Identifikationsnummer DE239653548", table.getNumberOfColumns()));

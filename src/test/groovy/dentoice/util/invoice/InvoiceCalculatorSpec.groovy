@@ -27,9 +27,10 @@ class InvoiceCalculatorSpec extends Specification {
 
         def invoice = new InvoiceEntity()
         invoice.setCosts([efforts: efforts, materials: materials] as CostWrapperEntity)
+        invoice.setMwst 7
 
         expect:
-        expectedSum == calculateInvoice(invoice, 7.00)
+        expectedSum == calculateInvoice(invoice)
 
         where:
         effortsData                                        | materialsData                                                                    | expectedSum
@@ -52,6 +53,7 @@ class InvoiceCalculatorSpec extends Specification {
 
         def invoice = new InvoiceEntity()
         invoice.setCosts([efforts: efforts, materials: materials] as CostWrapperEntity)
+        invoice.setMwst 7
 
         def invoices = []
         for (int i = 0; i < runs; i++) {
@@ -59,7 +61,7 @@ class InvoiceCalculatorSpec extends Specification {
         }
 
         expect:
-        expectedSum == calculateMonthlyInvoiceSum(invoices, 3.00, 7.00)
+        expectedSum == calculateMonthlyInvoiceSum(invoices, 3.00)
 
         where:
         effortsData                                        | materialsData                                                                    | expectedSum                                                                                | runs

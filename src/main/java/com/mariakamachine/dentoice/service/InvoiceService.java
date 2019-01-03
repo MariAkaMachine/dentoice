@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateInvoice;
 import static com.mariakamachine.dentoice.util.invoice.xml.XmlGenerator.generateInvoiceXmlFile;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -54,6 +55,7 @@ public class InvoiceService {
         entity.setInvoiceType(invoice.getInvoiceType());
         entity.setInsuranceType(invoice.getInsuranceType());
         entity.setDate(invoice.getDate());
+        entity.setMwst(invoice.getMwst());
         List<EffortJsonb> effortJsonbList = invoice.getEfforts().stream()
                 .map(effort -> new EffortJsonb(effort, effortService.getByPosition(effort.getPosition())))
                 .collect(toList());
@@ -61,6 +63,7 @@ public class InvoiceService {
                 .map(material -> new MaterialJsonb(material, materialService.getByPosition(material.getPosition())))
                 .collect(toList());
         entity.setCosts(new CostWrapperEntity(effortJsonbList, materialJsonbList));
+        entity.setBrutto(calculateInvoice(entity).getBrutto());
         return invoiceRepository.save(entity);
     }
 
@@ -78,7 +81,7 @@ public class InvoiceService {
                 .orElseThrow(() -> new NotFoundException(format("could not find invoice with [ id: %d ]", id)));
     }
 
-    public Page<InvoiceEntity> getAll(long dentistId, Pageable pageable) {
+    public Page<InvoiceEntity> getAllPaginated(long dentistId, Pageable pageable) {
         if (dentistId == -1) {
             return invoiceRepository.findAll(pageable);
         } else {
@@ -86,16 +89,20 @@ public class InvoiceService {
         }
     }
 
+    private List<InvoiceEntity> getAllByDentistBeforeDateAndAfterDater(long dentistId, LocalDate from, LocalDate to) {
+        return invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to);
+    }
+
     public FileResource getXmlById(long id) {
         return generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(getById(id), invoiceProperties));
     }
 
     public FileResource getPdfById(long id) {
-        return new InvoicePdfGenerator().generatePdf(getById(id), invoiceProperties);
+        return new InvoicePdfGenerator().generatePdf(getById(id));
     }
 
     public FileResource getMonthlyPdf(LocalDate from, LocalDate to, long dentistId) {
-        return new InvoicePdfGenerator().generateMonthlyPdf(invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to), invoiceProperties);
+        return new InvoicePdfGenerator().generateMonthlyPdf(getAllByDentistBeforeDateAndAfterDater(dentistId, from, to), invoiceProperties);
     }
 
 

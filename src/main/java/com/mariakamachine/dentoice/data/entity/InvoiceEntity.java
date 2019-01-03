@@ -20,10 +20,12 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
+import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateInvoice;
 import static java.util.stream.Collectors.toList;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
@@ -65,8 +67,12 @@ public class InvoiceEntity implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Convert(converter = LocalDateConverter.class)
     private LocalDate date;
+    @NotNull
+    private Integer mwst;
     @Type(type = "CostWrapperEntityJsonbUserType")
     private CostWrapperEntity costs;
+    @NotNull
+    private BigDecimal brutto;
 
     public InvoiceEntity updateEntity(Invoice invoice, DentistEntity dentist) {
         this.dentist = dentist;
@@ -76,6 +82,7 @@ public class InvoiceEntity implements Serializable {
         this.invoiceType = invoice.getInvoiceType();
         this.insuranceType = invoice.getInsuranceType();
         this.date = invoice.getDate();
+        this.mwst = invoice.getMwst();
         List<EffortJsonb> effortJsonbList = invoice.getEfforts().stream()
                 .map(EffortJsonb::new)
                 .collect(toList());
@@ -83,6 +90,7 @@ public class InvoiceEntity implements Serializable {
                 .map(MaterialJsonb::new)
                 .collect(toList());
         this.costs = new CostWrapperEntity(effortJsonbList, materialJsonbList);
+        this.brutto = calculateInvoice(this).getBrutto();
         return this;
     }
 

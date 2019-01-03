@@ -7,5 +7,7 @@ CREATE TABLE invoices (
   invoice_type   VARCHAR(255) NOT NULL,
   insurance_type VARCHAR(255) NOT NULL,
   date           DATE         NOT NULL,
-  costs          JSONB        NOT NULL
+  mwst           BIGINT       NOT NULL,
+  costs          JSONB        NOT NULL,
+  brutto         DECIMAL      NOT NULL
 );

@@ -24,7 +24,7 @@ import static java.util.Collections.singletonList;
 public class InvoiceConverter {
 
     public Laborabrechnung convertToXmlModel(InvoiceEntity invoice, InvoiceProperties invoiceProperties) {
-        InvoiceSum invoiceSum = calculateInvoice(invoice, invoiceProperties.getMwstPercentage());
+        InvoiceSum invoiceSum = calculateInvoice(invoice);
         // RECHNUNG
         Rechnung rechnung = new Rechnung();
         rechnung.setLaborSoftwareVersion(invoiceProperties.getSoftwareVersion());
@@ -37,7 +37,7 @@ public class InvoiceConverter {
         // MWST GRUPPE
         MwstGruppe mwstGruppe = new MwstGruppe();
         mwstGruppe.setNetto(convertToXsdConformInteger(invoiceSum.getNetto()));
-        mwstGruppe.setMwstSatz(convertToXsdConformInteger(invoiceProperties.getMwstPercentage() / 10));
+        mwstGruppe.setMwstSatz(convertToXsdConformInteger(new Double(invoice.getMwst()) / 10));
         mwstGruppe.setMwstBetrag(convertToXsdConformInteger(invoiceSum.getMwst()));
         // POSITIONEN - EFFORT
         List<Position> positionen = new ArrayList<>();

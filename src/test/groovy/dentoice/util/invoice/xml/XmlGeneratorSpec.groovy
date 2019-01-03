@@ -16,7 +16,7 @@ class XmlGeneratorSpec extends Specification {
 
     def "generate valid xml from invoice entity"() {
         given:
-        def properties = [xsdVersion: "4.0", softwareVersion: "0.0.1", mwstPercentage: 7.00, skontoPercentage: 3.00] as InvoiceProperties
+        def properties = [xsdVersion: "4.0", softwareVersion: "0.0.1", skontoPercentage: 3.00] as InvoiceProperties
 
         def efforts = [
                 [position: "0732", name: "Desinfektion", quantity: 1.00, pricePerUnit: 6.32] as EffortJsonb,
@@ -35,6 +35,7 @@ class XmlGeneratorSpec extends Specification {
                        invoiceType  : "INVOICE",
                        insuranceType: "KASSE",
                        date         : of(2018, 03, 13),
+                       mwst         : 7,
                        costs        : [efforts: efforts, materials: materials] as CostWrapperEntity
         ] as InvoiceEntity
 

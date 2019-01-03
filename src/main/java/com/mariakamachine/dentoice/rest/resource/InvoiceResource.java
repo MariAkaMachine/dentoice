@@ -99,7 +99,7 @@ public class InvoiceResource {
     @SuppressWarnings("unchecked")
     public PagedResources<InvoiceEntity> getAll(@RequestParam Long dentistId, int page, int size, PagedResourcesAssembler assembler) {
         PageRequest pageRequest = new PageRequest(page, size, by("date").ascending());
-        Page<InvoiceEntity> pageR = service.getAll(dentistId, pageRequest);
+        Page<InvoiceEntity> pageR = service.getAllPaginated(dentistId, pageRequest);
         if (page > pageR.getTotalPages()) {
             throw new NotFoundException(format("could not find any invoices for page %d with size %d", page, size));
         }

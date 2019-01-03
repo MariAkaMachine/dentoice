@@ -28,7 +28,7 @@ public class MonthlyPdfInvoice {
     public List<PdfPTable> generateTables(InvoiceProperties invoiceProperties, List<InvoiceEntity> invoices) {
         List<PdfPTable> tables = new ArrayList<>();
         tables.add(invoiceDetailsTable(invoices.get(0).getDate()));
-        tables.add(costsTable(invoiceProperties, invoices));
+        tables.add(costsTable(invoices));
         tables.add(footerTable(invoiceProperties, invoices));
         return tables;
     }
@@ -47,7 +47,7 @@ public class MonthlyPdfInvoice {
         return table;
     }
 
-    private PdfPTable costsTable(InvoiceProperties invoiceProperties, List<InvoiceEntity> invoices) {
+    private PdfPTable costsTable(List<InvoiceEntity> invoices) {
         log.info("creating costs table");
         PdfPTable table = new PdfPTable(new float[]{1, 1, 3, 1});
         table.setWidthPercentage(100);
@@ -59,7 +59,7 @@ public class MonthlyPdfInvoice {
             table.addCell(cell(valueOf(invoice.getId())));
             table.addCell(cell(invoice.getDate().format(ofPattern("dd.MM.yyyy"))));
             table.addCell(cell(invoice.getPatient()));
-            table.addCell(cellRight(calculateInvoice(invoice, invoiceProperties.getMwstPercentage()).getBrutto().toPlainString()));
+            table.addCell(cellRight(calculateInvoice(invoice).getBrutto().toPlainString()));
         }
         return table;
     }
@@ -84,7 +84,7 @@ public class MonthlyPdfInvoice {
         PdfPCell blankCell = cell(" ");
         blankCell.setColspan(3);
         table.addCell(blankCell);
-        MonthlyInvoiceSum monthlyInvoiceSum = calculateMonthlyInvoiceSum(invoices, invoiceProperties.getSkontoPercentage(), invoiceProperties.getMwstPercentage());
+        MonthlyInvoiceSum monthlyInvoiceSum = calculateMonthlyInvoiceSum(invoices, invoiceProperties.getSkontoPercentage());
 
         addFooterRow(table, "Zwischensumme", monthlyInvoiceSum.getSubtotal(), DEFAULT_FONT, TOP, NO_BORDER);
         addFooterRow(table, "Ohne Material", monthlyInvoiceSum.getEfforts(), DEFAULT_FONT, NO_BORDER, TOP);
