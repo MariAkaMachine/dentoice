@@ -27,7 +27,7 @@ public class InvoiceCalculator {
         BigDecimal metals = new BigDecimal(0.0);
         for (MaterialJsonb material : costs.getMaterials()) {
             BigDecimal materialCost = new BigDecimal(material.getQuantity()).multiply(new BigDecimal(material.getPricePerUnit()));
-            if (material.isMetal()) {
+            if (material.getIsMetal()) {
                 metals = metals.add(materialCost);
             }
             materials = materials.add(materialCost);

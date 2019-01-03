@@ -32,7 +32,7 @@ public class MaterialJsonb implements Serializable {
     @NotNull
     @Min(0)
     private Double pricePerUnit;
-    private boolean isMetal;
+    private Boolean isMetal;
 
     public MaterialJsonb(Material material) {
         this.position = material.getPosition();

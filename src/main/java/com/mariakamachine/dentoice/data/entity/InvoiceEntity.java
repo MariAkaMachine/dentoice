@@ -50,6 +50,7 @@ public class InvoiceEntity implements Serializable {
     private DentistEntity dentist;
     @NotBlank
     private String patient;
+    private String color;
     @NotBlank
     private String description;
     @NotBlank
@@ -77,6 +78,7 @@ public class InvoiceEntity implements Serializable {
     public InvoiceEntity updateEntity(Invoice invoice, DentistEntity dentist) {
         this.dentist = dentist;
         this.patient = invoice.getPatient();
+        this.color = invoice.getColor();
         this.description = invoice.getDescription();
         this.xmlNumber = invoice.getXmlNumber();
         this.invoiceType = invoice.getInvoiceType();

@@ -49,6 +49,7 @@ public class InvoiceService {
         InvoiceEntity entity = new InvoiceEntity();
         entity.setDentist(dentistService.getById(invoice.getDentist()));
         entity.setPatient(invoice.getPatient());
+        entity.setColor(invoice.getColor());
         entity.setDescription(invoice.getDescription());
         // TODO check for xml number duplicate for dentist
         entity.setXmlNumber(invoice.getXmlNumber());
@@ -124,7 +125,7 @@ public class InvoiceService {
             material2.setNotes("BEGO Legierung CE ja");
             material2.setQuantity(new BigDecimal(Math.random() * i).setScale(4, BigDecimal.ROUND_HALF_DOWN).doubleValue());
             material2.setPricePerUnit(51.25);
-            material2.setMetal(true);
+            material2.setIsMetal(true);
 
             MaterialJsonb material1 = new MaterialJsonb();
             material1.setPosition("7895");

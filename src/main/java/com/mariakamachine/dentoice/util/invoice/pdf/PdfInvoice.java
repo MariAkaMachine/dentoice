@@ -22,6 +22,7 @@ import static com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator.*
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Slf4j
@@ -55,8 +56,7 @@ class PdfInvoice {
         table.addCell(cell("Kassenart", 4));
         table.addCell(cell(invoice.getInsuranceType().toString(), 8));
         table.addCell(cell("Zahnfarbe", 6));
-        String zahnfarbe = "";
-        table.addCell(cell(zahnfarbe, 10));
+        table.addCell(cell(isBlank(invoice.getColor()) ? " " : invoice.getColor(), 10));
 
         return table;
     }

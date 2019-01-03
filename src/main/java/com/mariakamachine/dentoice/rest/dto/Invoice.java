@@ -23,6 +23,7 @@ public class Invoice {
     Long dentist;
     @NotBlank
     String patient;
+    String color;
     @NotBlank
     String description;
     @NotBlank
