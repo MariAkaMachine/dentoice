@@ -18,6 +18,9 @@ public interface InvoiceRepository extends PagingAndSortingRepository<InvoiceEnt
     Optional<InvoiceEntity> findById(long id);
 
     @Transactional(readOnly = true)
+    List<InvoiceEntity> findAllByDateAfterAndDateBeforeOrderByDateAsc(LocalDate from, LocalDate to);
+
+    @Transactional(readOnly = true)
     Page<InvoiceEntity> findAllByDentistId(long id, Pageable pageable);
 
     @Transactional(readOnly = true)

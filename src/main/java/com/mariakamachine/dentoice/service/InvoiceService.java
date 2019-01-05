@@ -90,8 +90,12 @@ public class InvoiceService {
         }
     }
 
-    private List<InvoiceEntity> getAllByDentistBeforeDateAndAfterDater(long dentistId, LocalDate from, LocalDate to) {
-        return invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from, to);
+    public List<InvoiceEntity> getAllFromTo(LocalDate from, LocalDate to) {
+        return invoiceRepository.findAllByDateAfterAndDateBeforeOrderByDateAsc(from.minusDays(1), to.plusDays(1));
+    }
+
+    public List<InvoiceEntity> getAllByDentistFromTo(long dentistId, LocalDate from, LocalDate to) {
+        return invoiceRepository.findAllByDentistIdAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, from.minusDays(1), to.plusDays(1));
     }
 
     public FileResource getXmlById(long id) {
@@ -103,7 +107,7 @@ public class InvoiceService {
     }
 
     public FileResource getMonthlyPdf(LocalDate from, LocalDate to, long dentistId) {
-        return new InvoicePdfGenerator().generateMonthlyPdf(getAllByDentistBeforeDateAndAfterDater(dentistId, from, to), invoiceProperties);
+        return new InvoicePdfGenerator().generateMonthlyPdf(getAllByDentistFromTo(dentistId, from, to), invoiceProperties);
     }
 
 

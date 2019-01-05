@@ -16,7 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Min;
 import java.time.LocalDate;
+import java.util.List;
 
 import static java.lang.String.format;
 import static org.springframework.data.domain.Sort.by;
@@ -104,6 +106,16 @@ public class InvoiceResource {
             throw new NotFoundException(format("could not find any invoices for page %d with size %d", page, size));
         }
         return assembler.toResource(pageR);
+    }
+
+    @GetMapping(path = "/from/{from}/to/{to}", produces = APPLICATION_JSON_UTF8_VALUE)
+    public List<InvoiceEntity> getAllFromTo(@PathVariable @DateTimeFormat(iso = DATE) LocalDate from, @PathVariable @DateTimeFormat(iso = DATE) LocalDate to) {
+        return service.getAllFromTo(from, to);
+    }
+
+    @GetMapping(path = "/from/{from}/to/{to}", params = {"dentist"}, produces = APPLICATION_JSON_UTF8_VALUE)
+    public List<InvoiceEntity> getAllFromToByDentist(@PathVariable @DateTimeFormat(iso = DATE) LocalDate from, @PathVariable @DateTimeFormat(iso = DATE) LocalDate to, @RequestParam @Min(1) Long dentist) {
+        return service.getAllByDentistFromTo(dentist, from, to);
     }
 
 }
