@@ -24,7 +24,7 @@ class XmlGeneratorSpec extends Specification {
         ] as List
 
         def materials = [
-                [position: "9005", name: "PlatinLloyd 100", quantity: 3.6, pricePerUnit: 51.25, notes: "BEGO Legierung CE 4004"] as MaterialJsonb
+                [position: "9005", name: "PlatinLloyd 100", quantity: 3.6, pricePerUnit: 51.25, notes: "BEGO Legierung CE 4004", isMetal: true] as MaterialJsonb
         ] as List
 
         def invoice = [id           : 18031234,
