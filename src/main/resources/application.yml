@@ -8,17 +8,19 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: com.mariakamachine.dentoice.config.postgres.JsonbPostgresSqlDialect
         jdbc:
           lob:
             non_contextual_creation: true
+  jmx:
+    enabled: false
   liquibase:
-    enabled: true
-    drop-first: true
-    user: postgres
+    enabled: false
+    drop-first: false
+    user: dentoice
 
 server:
   port: 9876
