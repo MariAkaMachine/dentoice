@@ -27,15 +27,15 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class InvoiceService {
 
-    private final InvoiceRepository invoiceRepository;
+    private final InvoiceRepository repository;
     private final InvoiceProperties invoiceProperties;
     private final DentistService dentistService;
     private final EffortService effortService;
     private final MaterialService materialService;
 
     @Autowired
-    public InvoiceService(InvoiceRepository invoiceRepository, InvoiceProperties invoiceProperties, DentistService dentistService, EffortService effortService, MaterialService materialService) {
-        this.invoiceRepository = invoiceRepository;
+    public InvoiceService(InvoiceRepository repository, InvoiceProperties invoiceProperties, DentistService dentistService, EffortService effortService, MaterialService materialService) {
+        this.repository = repository;
         this.invoiceProperties = invoiceProperties;
         this.dentistService = dentistService;
         this.effortService = effortService;
@@ -62,44 +62,39 @@ public class InvoiceService {
                 .collect(toList());
         entity.setCosts(new CostWrapperEntity(effortJsonbList, materialJsonbList));
         entity.setBrutto(calculateInvoice(entity).getBrutto());
-        return invoiceRepository.save(entity);
+        return repository.save(entity);
     }
 
     public InvoiceEntity update(long id, Invoice invoice) {
         InvoiceEntity invoiceEntity = getById(id);
-        return invoiceRepository.save(invoiceEntity
+        return repository.save(invoiceEntity
                 .updateEntity(invoice, dentistService.getById(invoiceEntity.getDentist().getId())));
     }
 
     public void delete(long id) {
-        invoiceRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
     public InvoiceEntity getById(long id) {
-        return invoiceRepository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(format("could not find invoice with [ id: %d ]", id)));
     }
 
     public List<InvoiceEntity> getAllFromTo(LocalDate from, LocalDate to) {
-        return invoiceRepository.findAllByInvoiceTypeEqualsAndDateAfterAndDateBeforeOrderByDateAsc(INVOICE, from.minusDays(1), to.plusDays(1));
+        return repository.findAllByInvoiceTypeEqualsAndDateAfterAndDateBeforeOrderByDateAsc(INVOICE, from.minusDays(1), to.plusDays(1));
     }
 
     public List<InvoiceEntity> getAllByDentistFromTo(long dentistId, LocalDate from, LocalDate to) {
-        return invoiceRepository.findAllByDentistIdAndInvoiceTypeEqualsAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, INVOICE, from.minusDays(1), to.plusDays(1));
+        return repository.findAllByDentistIdAndInvoiceTypeEqualsAndDateAfterAndDateBeforeOrderByDateAsc(dentistId, INVOICE, from.minusDays(1), to.plusDays(1));
     }
 
     public List<InvoiceEntity> getAllEstimates() {
-        return invoiceRepository.findAllByInvoiceTypeEquals(ESTIMATE);
+        return repository.findAllByInvoiceTypeEquals(ESTIMATE);
     }
 
     public List<InvoiceEntity> getAllEstimatesByDentist(long dentistId) {
-        return invoiceRepository.findAllByDentistIdAndInvoiceTypeEquals(dentistId, ESTIMATE);
+        return repository.findAllByDentistIdAndInvoiceTypeEquals(dentistId, ESTIMATE);
     }
-
-    public List<InvoiceEntity> getAllMonthliesByDentist(long dentistId) {
-        return invoiceRepository.findAllByDentistIdAndInvoiceTypeEquals(dentistId, ESTIMATE);
-    }
-
 
     public FileResource getXmlById(long id) {
         return generateInvoiceXmlFile(new InvoiceConverter().convertToXmlModel(getById(id), invoiceProperties));

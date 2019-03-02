@@ -27,7 +27,6 @@ import java.util.List;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateInvoice;
 import static java.util.stream.Collectors.toList;
-import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 
 @Entity(name = "invoice")
@@ -57,11 +56,11 @@ public class InvoiceEntity implements Serializable {
     @Column(name = "xml_number")
     private String xmlNumber;
     @NotNull
-    @Enumerated(STRING)
+    @Enumerated(EnumType.STRING)
     @Column(name = "invoice_type")
     private InvoiceType invoiceType;
     @NotNull
-    @Enumerated(STRING)
+    @Enumerated(EnumType.STRING)
     @Column(name = "insurance_type")
     private InsuranceType insuranceType;
     @NotNull

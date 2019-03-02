@@ -2,7 +2,6 @@ package com.mariakamachine.dentoice.util.invoice.pdf;
 
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import com.mariakamachine.dentoice.util.invoice.MonthlyInvoiceSum;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +24,11 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @Slf4j
 public class MonthlyPdfInvoice {
 
-    public List<PdfPTable> generateTables(InvoiceProperties invoiceProperties, List<InvoiceEntity> invoices) {
+    public List<PdfPTable> generateTables(int skonto, List<InvoiceEntity> invoices) {
         List<PdfPTable> tables = new ArrayList<>();
         tables.add(invoiceDetailsTable(invoices.get(0).getDate()));
         tables.add(costsTable(invoices));
-        tables.add(footerTable(invoiceProperties, invoices));
+        tables.add(footerTable(skonto, invoices));
         return tables;
     }
 
@@ -73,7 +72,7 @@ public class MonthlyPdfInvoice {
         table.addCell(headerCellRight("Betrag"));
     }
 
-    private PdfPTable footerTable(InvoiceProperties invoiceProperties, List<InvoiceEntity> invoices) {
+    private PdfPTable footerTable(int skonto, List<InvoiceEntity> invoices) {
         log.info("creating footer table");
         PdfPTable table = new PdfPTable(7);
         table.setTotalWidth(A4.getWidth() - 100);
@@ -84,11 +83,11 @@ public class MonthlyPdfInvoice {
         PdfPCell blankCell = cell(" ");
         blankCell.setColspan(3);
         table.addCell(blankCell);
-        MonthlyInvoiceSum monthlyInvoiceSum = calculateMonthlyInvoiceSum(invoices, invoiceProperties.getSkontoPercentage());
+        MonthlyInvoiceSum monthlyInvoiceSum = calculateMonthlyInvoiceSum(invoices, skonto);
 
         addFooterRow(table, "Zwischensumme", monthlyInvoiceSum.getSubtotal(), DEFAULT_FONT, TOP, NO_BORDER);
         addFooterRow(table, "Ohne Material", monthlyInvoiceSum.getEfforts(), DEFAULT_FONT, NO_BORDER, TOP);
-        addFooterRow(table, format("Skonto (%s%%)", invoiceProperties.getSkontoPercentage()), monthlyInvoiceSum.getSkonto(), DEFAULT_FONT, NO_BORDER, BOTTOM);
+        addFooterRow(table, format("Skonto (%d%%)", skonto), monthlyInvoiceSum.getSkonto(), DEFAULT_FONT, NO_BORDER, BOTTOM);
         addFooterRow(table, "Gesamtbetrag", monthlyInvoiceSum.getTotal(), BOLD_FONT, BOTTOM, NO_BORDER);
 
         table.addCell(fineCell("Umsatzsteuer-Identifikationsnummer DE239653548", table.getNumberOfColumns()));

@@ -37,7 +37,7 @@ public class InvoicePdfGenerator {
     static final Font BOLD_FONT = getFont(COURIER_BOLD, 9);
     private static final Font SMALL_FONT = getFont(COURIER, 7);
 
-    public FileResource generateMonthlyPdf(List<InvoiceEntity> invoices, InvoiceProperties invoiceProperties) {
+    public FileResource generateMonthlyPdf(List<InvoiceEntity> invoices, int skonto) {
         final String pdfName = invoices.get(0).getDate().format(ofPattern("MM/yyyy"));
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         Document pdf = new Document(A4, 50, 50, 110, 150);
@@ -46,7 +46,7 @@ public class InvoicePdfGenerator {
             pdf.open();
             writer.setPageEvent(new PdfPageNumberEvent(pdfName, true));
             pdf.add(recipientDetails(invoices.get(0).getDentist()));
-            addTablesToPdf(pdf, writer, new MonthlyPdfInvoice().generateTables(invoiceProperties, invoices));
+            addTablesToPdf(pdf, writer, new MonthlyPdfInvoice().generateTables(skonto, invoices));
             pdf.close();
         } catch (DocumentException e) {
             log.error("unable to generate pdf invoice for monthly invoice", e);

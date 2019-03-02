@@ -96,9 +96,4 @@ public class InvoiceResource {
         return service.getAllEstimatesByDentist(dentist);
     }
 
-    @GetMapping(path = "/monthlies", params = {"dentist"}, produces = APPLICATION_JSON_UTF8_VALUE)
-    public List<InvoiceEntity> getAllMonthlies(@RequestParam @Min(1) Long dentist) {
-        return service.getAllMonthliesByDentist(dentist);
-    }
-
 }

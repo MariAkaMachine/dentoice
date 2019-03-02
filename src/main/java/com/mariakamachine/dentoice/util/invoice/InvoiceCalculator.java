@@ -39,7 +39,7 @@ public class InvoiceCalculator {
         return new InvoiceSum(round(efforts), round(materials), round(metals), netto, mwst, netto.add(mwst));
     }
 
-    public static MonthlyInvoiceSum calculateMonthlyInvoiceSum(List<InvoiceEntity> invoices, double skontoPercentage) {
+    public static MonthlyInvoiceSum calculateMonthlyInvoiceSum(List<InvoiceEntity> invoices, int skontoPercentage) {
         BigDecimal subtotal = new BigDecimal(0.0);
         BigDecimal efforts = new BigDecimal(0.0);
         for (InvoiceEntity invoice : invoices) {
@@ -55,7 +55,7 @@ public class InvoiceCalculator {
         return round(new BigDecimal(quantity).multiply(new BigDecimal(pricePerUnit)));
     }
 
-    private static BigDecimal calculatePercentage(BigDecimal sum, double percentage) {
+    private static BigDecimal calculatePercentage(BigDecimal sum, int percentage) {
         return round(sum.multiply(new BigDecimal(percentage)).divide(new BigDecimal(100)));
     }
 
