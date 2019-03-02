@@ -1,17 +1,12 @@
 package com.mariakamachine.dentoice.rest.resource;
 
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
-import com.mariakamachine.dentoice.exception.NotFoundException;
 import com.mariakamachine.dentoice.model.FileResource;
 import com.mariakamachine.dentoice.rest.dto.Invoice;
 import com.mariakamachine.dentoice.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.hateoas.PagedResources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +15,6 @@ import javax.validation.constraints.Min;
 import java.time.LocalDate;
 import java.util.List;
 
-import static java.lang.String.format;
-import static org.springframework.data.domain.Sort.by;
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -83,31 +76,6 @@ public class InvoiceResource {
                 .body(pdfResource.getResource());
     }
 
-    @GetMapping(path = "/from/{from}/to/{to}/pdf", params = {"dentist"}, produces = APPLICATION_OCTET_STREAM_VALUE)
-    @ResponseBody
-    public ResponseEntity<Resource> getByDentistId(@PathVariable @DateTimeFormat(iso = DATE) LocalDate from, @PathVariable @DateTimeFormat(iso = DATE) LocalDate to, @RequestParam Long dentist) {
-        FileResource monthlyPdfResource = service.getMonthlyPdf(from, to, dentist);
-        return ok()
-                .header(CONTENT_DISPOSITION, "attachment; filename=\"" + monthlyPdfResource.getFileName() + "\"")
-                .body(monthlyPdfResource.getResource());
-    }
-
-    @GetMapping(params = {"page", "size"}, produces = APPLICATION_JSON_UTF8_VALUE)
-    public PagedResources<InvoiceEntity> getAll(int page, int size, PagedResourcesAssembler assembler) {
-        return getAll(-1L, page, size, assembler);
-    }
-
-    @GetMapping(params = {"dentistId", "page", "size"}, produces = APPLICATION_JSON_UTF8_VALUE)
-    @SuppressWarnings("unchecked")
-    public PagedResources<InvoiceEntity> getAll(@RequestParam Long dentistId, int page, int size, PagedResourcesAssembler assembler) {
-        PageRequest pageRequest = new PageRequest(page, size, by("date").ascending());
-        Page<InvoiceEntity> pageR = service.getAllPaginated(dentistId, pageRequest);
-        if (page > pageR.getTotalPages()) {
-            throw new NotFoundException(format("could not find any invoices for page %d with size %d", page, size));
-        }
-        return assembler.toResource(pageR);
-    }
-
     @GetMapping(path = "/from/{from}/to/{to}", produces = APPLICATION_JSON_UTF8_VALUE)
     public List<InvoiceEntity> getAllFromTo(@PathVariable @DateTimeFormat(iso = DATE) LocalDate from, @PathVariable @DateTimeFormat(iso = DATE) LocalDate to) {
         return service.getAllFromTo(from, to);
@@ -116,6 +84,21 @@ public class InvoiceResource {
     @GetMapping(path = "/from/{from}/to/{to}", params = {"dentist"}, produces = APPLICATION_JSON_UTF8_VALUE)
     public List<InvoiceEntity> getAllFromToByDentist(@PathVariable @DateTimeFormat(iso = DATE) LocalDate from, @PathVariable @DateTimeFormat(iso = DATE) LocalDate to, @RequestParam @Min(1) Long dentist) {
         return service.getAllByDentistFromTo(dentist, from, to);
+    }
+
+    @GetMapping(path = "/estimates", produces = APPLICATION_JSON_UTF8_VALUE)
+    public List<InvoiceEntity> getAllEstimates() {
+        return service.getAllEstimates();
+    }
+
+    @GetMapping(path = "/estimates", params = {"dentist"}, produces = APPLICATION_JSON_UTF8_VALUE)
+    public List<InvoiceEntity> getAllEstimates(@RequestParam @Min(1) Long dentist) {
+        return service.getAllEstimatesByDentist(dentist);
+    }
+
+    @GetMapping(path = "/monthlies", params = {"dentist"}, produces = APPLICATION_JSON_UTF8_VALUE)
+    public List<InvoiceEntity> getAllMonthlies(@RequestParam @Min(1) Long dentist) {
+        return service.getAllMonthliesByDentist(dentist);
     }
 
 }
