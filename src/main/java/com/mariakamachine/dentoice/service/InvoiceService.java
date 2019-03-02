@@ -69,8 +69,9 @@ public class InvoiceService {
     }
 
     public InvoiceEntity update(long id, Invoice invoice) {
-        return invoiceRepository.save(getById(id)
-                .updateEntity(invoice, dentistService.getById(id)));
+        InvoiceEntity invoiceEntity = getById(id);
+        return invoiceRepository.save(invoiceEntity
+                .updateEntity(invoice, dentistService.getById(invoiceEntity.getDentist().getId())));
     }
 
     public void delete(long id) {
