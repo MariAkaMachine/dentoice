@@ -15,6 +15,8 @@ import java.util.List;
 
 import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateMonthlyInvoiceSum;
 import static java.lang.String.format;
+import static java.time.LocalDate.now;
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
@@ -35,6 +37,7 @@ public class MonthlyService {
     public MonthlyEntity create(Monthly monthly) {
         MonthlyEntity entity = new MonthlyEntity();
         entity.setDentist(dentistService.getById(monthly.getDentist()));
+        entity.setDescription(now().format(ofPattern("MM/yyyy")));
         entity.setDate(monthly.getDate());
         entity.setSkonto(monthly.getSkonto());
         entity.setInvoices(monthly.getInvoices());
@@ -63,7 +66,7 @@ public class MonthlyService {
 
     public FileResource getMonthlyPdf(long id) {
         MonthlyEntity entity = getById(id);
-        return new InvoicePdfGenerator().generateMonthlyPdf(getInvoiceEntities(entity.getInvoices()), entity.getSkonto());
+        return new InvoicePdfGenerator().generateMonthlyPdf(entity, getInvoiceEntities(entity.getInvoices()));
     }
 
     private List<InvoiceEntity> getInvoiceEntities(Long[] invoices) {

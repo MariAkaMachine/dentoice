@@ -3,10 +3,10 @@ package com.mariakamachine.dentoice.util.invoice.pdf;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
+import com.mariakamachine.dentoice.data.entity.MonthlyEntity;
 import com.mariakamachine.dentoice.util.invoice.MonthlyInvoiceSum;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,30 +18,29 @@ import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calcula
 import static com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator.*;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
 
 @Slf4j
 public class MonthlyPdfInvoice {
 
-    public List<PdfPTable> generateTables(int skonto, List<InvoiceEntity> invoices) {
+    public List<PdfPTable> generateTables(MonthlyEntity monthlyEntity, List<InvoiceEntity> invoices) {
         List<PdfPTable> tables = new ArrayList<>();
-        tables.add(invoiceDetailsTable(invoices.get(0).getDate()));
+        tables.add(invoiceDetailsTable(monthlyEntity));
         tables.add(costsTable(invoices));
-        tables.add(footerTable(skonto, invoices));
+        tables.add(footerTable(monthlyEntity.getSkonto(), invoices));
         return tables;
     }
 
-    private PdfPTable invoiceDetailsTable(LocalDate date) {
+    private PdfPTable invoiceDetailsTable(MonthlyEntity monthlyEntity) {
         log.info("creating invoice details table");
         PdfPTable table = new PdfPTable(2);
         table.setWidthPercentage(45);
         table.setHorizontalAlignment(ALIGN_RIGHT);
 
         table.addCell(cell("Monatsaufstellung", 5));
-        table.addCell(cell(date.format(ofPattern("MM/yyyy")), 9));
+        table.addCell(cell(monthlyEntity.getDescription(), 9));
         table.addCell(cell("Rechnungsdatum", 6));
-        table.addCell(cell(now().format(ofPattern("dd.MM.yyyy")), 10));
+        table.addCell(cell(monthlyEntity.getDate().format(ofPattern("dd.MM.yyyy")), 10));
 
         return table;
     }

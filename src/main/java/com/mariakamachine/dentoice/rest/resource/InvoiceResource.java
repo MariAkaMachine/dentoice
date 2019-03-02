@@ -24,7 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("/v1/invoices")
+@RequestMapping("/invoices")
 @CrossOrigin
 @Validated
 public class InvoiceResource {

@@ -7,9 +7,9 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.DentistEntity;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
+import com.mariakamachine.dentoice.data.entity.MonthlyEntity;
 import com.mariakamachine.dentoice.model.FileResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -28,7 +28,6 @@ import static com.itextpdf.text.pdf.BaseFont.COURIER_BOLD;
 import static com.itextpdf.text.pdf.PdfWriter.getInstance;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static java.time.format.DateTimeFormatter.ofPattern;
 
 @Slf4j
 public class InvoicePdfGenerator {
@@ -37,16 +36,16 @@ public class InvoicePdfGenerator {
     static final Font BOLD_FONT = getFont(COURIER_BOLD, 9);
     private static final Font SMALL_FONT = getFont(COURIER, 7);
 
-    public FileResource generateMonthlyPdf(List<InvoiceEntity> invoices, int skonto) {
-        final String pdfName = invoices.get(0).getDate().format(ofPattern("MM/yyyy"));
+    public FileResource generateMonthlyPdf(MonthlyEntity monthlyEntity, List<InvoiceEntity> invoices) {
+        final String pdfName = monthlyEntity.getDescription();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         Document pdf = new Document(A4, 50, 50, 110, 150);
         try {
             PdfWriter writer = getInstance(pdf, stream);
             pdf.open();
             writer.setPageEvent(new PdfPageNumberEvent(pdfName, true));
-            pdf.add(recipientDetails(invoices.get(0).getDentist()));
-            addTablesToPdf(pdf, writer, new MonthlyPdfInvoice().generateTables(skonto, invoices));
+            pdf.add(recipientDetails(monthlyEntity.getDentist()));
+            addTablesToPdf(pdf, writer, new MonthlyPdfInvoice().generateTables(monthlyEntity, invoices));
             pdf.close();
         } catch (DocumentException e) {
             log.error("unable to generate pdf invoice for monthly invoice", e);

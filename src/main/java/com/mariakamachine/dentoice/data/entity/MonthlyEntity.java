@@ -9,6 +9,7 @@ import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDa
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
+import static java.time.LocalDate.now;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -35,6 +37,8 @@ public class MonthlyEntity implements Serializable {
     @ManyToOne(targetEntity = DentistEntity.class, fetch = LAZY, optional = false)
     @JoinColumn(name = "dentists_id", nullable = false)
     private DentistEntity dentist;
+    @NotBlank
+    private String description;
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Convert(converter = LocalDateConverter.class)
@@ -48,7 +52,7 @@ public class MonthlyEntity implements Serializable {
 
     public MonthlyEntity updateEntity(Monthly monthly, DentistEntity dentist, BigDecimal total) {
         this.dentist = dentist;
-        this.date = monthly.getDate();
+        this.date = now();
         this.invoices = monthly.getInvoices();
         this.skonto = monthly.getSkonto();
         this.total = total;

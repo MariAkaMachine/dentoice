@@ -15,7 +15,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 
 @RestController
-@RequestMapping("/v1/patients")
+@RequestMapping("/patients")
 @CrossOrigin
 @Validated
 public class PatientResource {
