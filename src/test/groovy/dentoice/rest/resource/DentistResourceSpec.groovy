@@ -44,7 +44,7 @@ class DentistResourceSpec extends Specification {
     @Unroll
     def "create dentists with several payload variations"() {
         expect:
-        mockMvc.perform(post("/v1/dentists/create")
+        mockMvc.perform(post("/dentists/create")
                 .contentType(APPLICATION_JSON_UTF8_VALUE)
                 .content(payload))
                 .andExpect(status().is(responseStatus))
@@ -63,7 +63,7 @@ class DentistResourceSpec extends Specification {
         def id = fillDbWithTestEntriesAndReturnIds(1)[0]
 
         expect:
-        mockMvc.perform(patch("/v1/dentists/${id}")
+        mockMvc.perform(patch("/dentists/${id}")
                 .contentType(APPLICATION_JSON_UTF8_VALUE)
                 .content(
                 """
@@ -97,7 +97,7 @@ class DentistResourceSpec extends Specification {
         def id = fillDbWithTestEntriesAndReturnIds(1)[0]
 
         when:
-        mockMvc.perform(delete("/v1/dentists/${id}"))
+        mockMvc.perform(delete("/dentists/${id}"))
                 .andExpect(status().isNoContent())
 
         then:
@@ -111,7 +111,7 @@ class DentistResourceSpec extends Specification {
         def id = fillDbWithTestEntriesAndReturnIds(1)[0]
 
         expect:
-        mockMvc.perform(get("/v1/dentists/${id}"))
+        mockMvc.perform(get("/dentists/${id}"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(
                 """
@@ -133,7 +133,7 @@ class DentistResourceSpec extends Specification {
         def expectedJson = toJson asList(expectedData)
 
         expect:
-        mockMvc.perform(get("/v1/dentists")
+        mockMvc.perform(get("/dentists")
                 .param("lastName", data.lastName))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedJson))
@@ -147,7 +147,7 @@ class DentistResourceSpec extends Specification {
         def expectedJson = toJson asList(expectedData)
 
         expect:
-        mockMvc.perform(get("/v1/dentists")
+        mockMvc.perform(get("/dentists")
                 .param("firstName", data.firstName)
                 .param("lastName", data.lastName))
                 .andExpect(status().isOk())
@@ -161,7 +161,7 @@ class DentistResourceSpec extends Specification {
         fillDbWithTestEntriesAndReturnIds(entries)
 
         expect:
-        mockMvc.perform(get("/v1/dentists"))
+        mockMvc.perform(get("/dentists"))
                 .andExpect(status().isOk())
                 .andExpect({ assert new JSONArray(it.getResponse().getContentAsString()).length() == entries })
     }

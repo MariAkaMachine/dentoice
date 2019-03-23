@@ -61,7 +61,7 @@ class InvoiceCalculatorSpec extends Specification {
         }
 
         expect:
-        expectedSum == calculateMonthlyInvoiceSum(invoices, 3.00)
+        expectedSum == calculateMonthlyInvoiceSum(invoices, 3)
 
         where:
         effortsData                                        | materialsData                                                                    | expectedSum                                                                                | runs
