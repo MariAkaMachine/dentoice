@@ -5,11 +5,10 @@ import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.property.HorizontalAlignment;
+import com.itextpdf.layout.property.TextAlignment;
 
 import static com.itextpdf.layout.borders.Border.NO_BORDER;
-import static com.itextpdf.layout.property.HorizontalAlignment.LEFT;
-import static com.itextpdf.layout.property.HorizontalAlignment.RIGHT;
+import static com.itextpdf.layout.property.TextAlignment.*;
 
 
 public class PdfCellFormatter {
@@ -26,7 +25,7 @@ public class PdfCellFormatter {
         return marginCell(text, RIGHT);
     }
 
-    static Cell marginCell(String text, HorizontalAlignment alignment) {
+    static Cell marginCell(String text, TextAlignment alignment) {
         Cell cell = cell(text, alignment, null, null);
 //        Cell cell = cell(text, alignment, DEFAULT_FONT, 3);
         cell.setPaddingTop(5);
@@ -48,14 +47,23 @@ public class PdfCellFormatter {
         return cell(text, LEFT, border);
     }
 
-    static Cell cell(String text, HorizontalAlignment alignment, Border border) {
+    static Cell cell(String text, TextAlignment alignment, Border border) {
         return cell(text, alignment, null, border);
 //        return cell(text, alignment, DEFAULT_FONT, border);
     }
 
+    static Cell fineCell(String text) {
+        return new Cell()
+                .setTextAlignment(CENTER)
+                .add(new Paragraph(text))
+                .setFontSize(8f)
+                .setItalic()
+                .setBorder(NO_BORDER);
+    }
+
     static Cell fineCell(String text, int colSpan) {
         return new Cell()
-                .setHorizontalAlignment(LEFT)
+                .setTextAlignment(LEFT)
                 .add(new Paragraph(text))
                 .setFontSize(8f)
                 .setItalic()
@@ -66,11 +74,12 @@ public class PdfCellFormatter {
 //        return cell;
     }
 
-    static Cell cell(String text, HorizontalAlignment alignment, PdfFont font, Border border) {
+    static Cell cell(String text, TextAlignment alignment, PdfFont font, Border border) {
         return new Cell()
-                .setHorizontalAlignment(alignment)
+                //                .setHorizontalAlignment(alignment)
                 .add(new Paragraph(text))
-//                .setFont(font)
+                .setTextAlignment(alignment)
+//                    .setFont(PdfFontFactory.createFont(StandardFonts.COURIER))
                 .setBorder(border);
     }
 

@@ -1,44 +1,35 @@
-//package com.mariakamachine.dentoice.util.invoice.pdf;
-//
-//import com.itextpdf.text.Document;
-//import com.itextpdf.text.Phrase;
-//import com.itextpdf.text.pdf.PdfPCell;
-//import com.itextpdf.text.pdf.PdfPTable;
-//import com.itextpdf.text.pdf.PdfPageEventHelper;
-//import com.itextpdf.text.pdf.PdfWriter;
-//
-//import static com.itextpdf.text.Element.ALIGN_CENTER;
-//import static com.itextpdf.text.FontFactory.COURIER;
-//import static com.itextpdf.text.FontFactory.getFont;
-//import static com.itextpdf.text.PageSize.A4;
-//import static java.lang.String.format;
-//
-//public class PdfPageNumberEvent extends PdfPageEventHelper {
-//
-//    private String parameter;
-//    private boolean isMonthly;
-//
-//    PdfPageNumberEvent(String parameter, boolean isMonthly) {
-//        this.parameter = parameter;
-//        this.isMonthly = isMonthly;
-//    }
-//
-//    @Override
-//    public void onEndPage(PdfWriter writer, Document document) {
-//        PdfPTable table = new PdfPTable(1);
-//        table.setTotalWidth(A4.getWidth() - 100);
-//        table.setLockedWidth(true);
-//        table.setHorizontalAlignment(ALIGN_CENTER);
-//        table.addCell(cell(format(isMonthly ? "Monatsaufstellung %s - Seite %d" : "Rechnung %s - Seite %d", parameter, writer.getCurrentPageNumber())));
-//        table.writeSelectedRows(0, -1, document.left(), 40, writer.getDirectContent());
-//    }
-//
-//    private PdfPCell cell(String text) {
-//        PdfPCell cell = new PdfPCell();
-//        cell.setHorizontalAlignment(ALIGN_CENTER);
-//        cell.setPhrase(new Phrase(text, getFont(COURIER, 8)));
-//        cell.setBorder(0);
-//        return cell;
-//    }
-//
-//}
+package com.mariakamachine.dentoice.util.invoice.pdf;
+
+import com.itextpdf.kernel.events.Event;
+import com.itextpdf.kernel.events.IEventHandler;
+import com.itextpdf.kernel.events.PdfDocumentEvent;
+import com.itextpdf.kernel.pdf.PdfPage;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Table;
+
+import static com.mariakamachine.dentoice.util.invoice.pdf.PdfCellFormatter.fineCell;
+import static java.lang.String.format;
+
+public class PdfPageNumberEvent implements IEventHandler {
+
+    private Document doc;
+    private String parameter;
+    private boolean isMonthly;
+
+    PdfPageNumberEvent(Document doc, String parameter, boolean isMonthly) {
+        this.doc = doc;
+        this.parameter = parameter;
+        this.isMonthly = isMonthly;
+    }
+
+    @Override
+    public void handleEvent(Event event) {
+        PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
+        PdfPage page = docEvent.getPage();
+        Table table = new Table(1);
+        table.addCell(fineCell((format(isMonthly ? "Monatsaufstellung %s - Seite %d" : "Rechnung %s - Seite %d", parameter, docEvent.getDocument().getPageNumber(page)))));
+        table.setFixedPosition(page.getPageSize().getWidth() / 2, 50, 200);
+        doc.add(table);
+    }
+
+}
