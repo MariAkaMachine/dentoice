@@ -66,7 +66,7 @@ public class MonthlyPdfInvoiceGenerator {
 //        table.setLockedWidth(true);
 //        table.setHorizontalAlignment(ALIGN_CENTER);
 //
-//        table.addCell(fineCell("Die genannten Beträge sind Bruttobeträge. Die hierin enthaltene Umsatzsteuer ist in den einzelnen Rechnungen ausgewiesen.\nZahlbar innerhalb von zehn (10) Tagen abzüglich Skonto.", 4));
+//        table.addCell(fineCellCentered("Die genannten Beträge sind Bruttobeträge. Die hierin enthaltene Umsatzsteuer ist in den einzelnen Rechnungen ausgewiesen.\nZahlbar innerhalb von zehn (10) Tagen abzüglich Skonto.", 4));
 //        Cell blankCell = cell(" ");
 //        blankCell.setColspan(3);
 //        table.addCell(blankCell);
@@ -77,7 +77,7 @@ public class MonthlyPdfInvoiceGenerator {
 //        addFooterRow(table, format("Skonto (%d%%)", skonto), monthlyInvoiceSum.getSkonto(), DEFAULT_FONT, NO_BORDER, BOTTOM);
 //        addFooterRow(table, "Gesamtbetrag", monthlyInvoiceSum.getTotal(), BOLD_FONT, BOTTOM, NO_BORDER);
 //
-//        table.addCell(fineCell("Umsatzsteuer-Identifikationsnummer DE239653548", table.getNumberOfColumns()));
+//        table.addCell(fineCellCentered("Umsatzsteuer-Identifikationsnummer DE239653548", table.getNumberOfColumns()));
 //
 //        return table;
 //    }

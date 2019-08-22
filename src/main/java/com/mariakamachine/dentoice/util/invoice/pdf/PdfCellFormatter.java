@@ -1,11 +1,14 @@
 package com.mariakamachine.dentoice.util.invoice.pdf;
 
 
-import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
+
+import java.math.BigDecimal;
 
 import static com.itextpdf.layout.borders.Border.NO_BORDER;
 import static com.itextpdf.layout.property.TextAlignment.*;
@@ -13,94 +16,70 @@ import static com.itextpdf.layout.property.TextAlignment.*;
 
 public class PdfCellFormatter {
 
-//    static final Font DEFAULT_FONT = getFont(COURIER, 9);
-//    static final Font BOLD_FONT = getFont(COURIER_BOLD, 9);
-//    private static final Font SMALL_FONT = getFont(COURIER, 7);
-
-    static Cell headerCell(String text) {
-        return marginCell(text, LEFT);
+    static Cell headerCell(String text, int colSpan) {
+        return marginCell(text, LEFT, colSpan).setBorderTop(new SolidBorder(1)).setBorderBottom(new SolidBorder(1));
     }
 
-    static Cell headerCellRight(String text) {
-        return marginCell(text, RIGHT);
+    static Cell headerCellRight(String text, int colSpan) {
+        return marginCell(text, RIGHT, colSpan).setBorderTop(new SolidBorder(1)).setBorderBottom(new SolidBorder(1));
     }
 
-    static Cell marginCell(String text, TextAlignment alignment) {
-        Cell cell = cell(text, alignment, null, null);
-//        Cell cell = cell(text, alignment, DEFAULT_FONT, 3);
+    private static Cell marginCell(String text, TextAlignment alignment, int colSpan) {
+        Cell cell = cell(text, alignment, colSpan, NO_BORDER);
         cell.setPaddingTop(5);
         cell.setPaddingBottom(5);
         return cell;
     }
 
     static Cell cell(String text) {
-        return cell(text, LEFT, NO_BORDER);
-//        return cell(text, LEFT, NO_BORDER);
+        return cell(text, LEFT, 1, NO_BORDER);
+    }
+
+    static Cell cell(String text, int colSpan) {
+        return cell(text, LEFT, colSpan, NO_BORDER);
     }
 
     static Cell cellRight(String text) {
-        return cell(text, RIGHT, NO_BORDER);
-//        return cell(text, RIGHT, NO_BORDER);
+        return cellRight(text, 1);
     }
 
-    static Cell cell(String text, Border border) {
-        return cell(text, LEFT, border);
+    static Cell cellRight(String text, int colSpan) {
+        return cell(text, RIGHT, colSpan, NO_BORDER);
     }
 
-    static Cell cell(String text, TextAlignment alignment, Border border) {
-        return cell(text, alignment, null, border);
-//        return cell(text, alignment, DEFAULT_FONT, border);
-    }
-
-    static Cell fineCell(String text) {
+    static Cell fineCellCentered(String text) {
         return new Cell()
                 .setTextAlignment(CENTER)
                 .add(new Paragraph(text))
-                .setFontSize(8f)
+                .setFontSize(7f)
                 .setItalic()
                 .setBorder(NO_BORDER);
+    }
+
+    static Cell fineCell(String text) {
+        return fineCell(text, 1);
     }
 
     static Cell fineCell(String text, int colSpan) {
-        return new Cell()
+        return new Cell(1, colSpan)
                 .setTextAlignment(LEFT)
                 .add(new Paragraph(text))
-                .setFontSize(8f)
+                .setFontSize(7f)
                 .setItalic()
                 .setBorder(NO_BORDER);
-        //        Cell cell = cell(text, LEFT, null, 0);
-//        Cell cell = cell(text, ALIGN_LEFT, SMALL_FONT, NO_BORDER);
-//        cell.setColspan(colSpan);
-//        return cell;
     }
 
-    static Cell cell(String text, TextAlignment alignment, PdfFont font, Border border) {
-        return new Cell()
-                //                .setHorizontalAlignment(alignment)
+    static Cell cell(String text, TextAlignment alignment, int colSpan, Border border) {
+        return new Cell(1, colSpan)
                 .add(new Paragraph(text))
                 .setTextAlignment(alignment)
-//                    .setFont(PdfFontFactory.createFont(StandardFonts.COURIER))
+                .setFontSize(10f)
                 .setBorder(border);
     }
 
-    /*
-     * ROW FORMATTING
-     */
-
-//    static void addEmptyRow(Table table) {
-//        Cell cell = cell(" ");
-//        cell.setColspan(table.getNumberOfColumns());
-//        table.addCell(cell);
-//    }
-//
-//    static void addFooterRow(PdfPTable table, String text, BigDecimal sum, Font font, int outerBorder, int innerBorder) {
-//        Cell blankCell = cell(" ", outerBorder);
-//        blankCell.setColspan(4);
-//        table.addCell(blankCell);
-//        Cell textCell = cell(text, ALIGN_LEFT, font, outerBorder + innerBorder);
-//        textCell.setColspan(2);
-//        table.addCell(textCell);
-//        table.addCell(cell(sum.toPlainString() + " €", ALIGN_RIGHT, font, outerBorder + innerBorder));
-//    }
+    static void addEmptyRow(Table table) {
+        Cell cell = cell(" ", table.getNumberOfColumns());
+        table.addCell(cell);
+    }
 
 }
