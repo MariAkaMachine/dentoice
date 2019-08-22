@@ -9,7 +9,7 @@ import com.mariakamachine.dentoice.data.repository.InvoiceRepository;
 import com.mariakamachine.dentoice.exception.NotFoundException;
 import com.mariakamachine.dentoice.model.FileResource;
 import com.mariakamachine.dentoice.rest.dto.Invoice;
-import com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator;
+import com.mariakamachine.dentoice.util.invoice.pdf.PdfGenerator;
 import com.mariakamachine.dentoice.util.invoice.xml.InvoiceConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -101,7 +101,7 @@ public class InvoiceService {
     }
 
     public FileResource getPdfById(long id) {
-        return new InvoicePdfGenerator().generatePdf(getById(id));
+        return new PdfGenerator().generatePdfInvoice(getById(id));
     }
 
 }

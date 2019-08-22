@@ -6,7 +6,7 @@ import com.mariakamachine.dentoice.data.repository.MonthliesRepository;
 import com.mariakamachine.dentoice.exception.NotFoundException;
 import com.mariakamachine.dentoice.model.FileResource;
 import com.mariakamachine.dentoice.rest.dto.Monthly;
-import com.mariakamachine.dentoice.util.invoice.pdf.InvoicePdfGenerator;
+import com.mariakamachine.dentoice.util.invoice.pdf.PdfGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,7 +66,7 @@ public class MonthlyService {
 
     public FileResource getMonthlyPdf(long id) {
         MonthlyEntity entity = getById(id);
-        return new InvoicePdfGenerator().generateMonthlyPdf(entity, getInvoiceEntities(entity.getInvoices()));
+        return new PdfGenerator().generateMonthlyPdfInvoice(entity, getInvoiceEntities(entity.getInvoices()));
     }
 
     private List<InvoiceEntity> getInvoiceEntities(Long[] invoices) {

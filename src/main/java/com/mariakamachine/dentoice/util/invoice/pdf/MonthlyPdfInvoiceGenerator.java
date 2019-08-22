@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class MonthlyPdfInvoice {
+public class MonthlyPdfInvoiceGenerator {
 
     public List<Table> generateTables(MonthlyEntity monthlyEntity, List<InvoiceEntity> invoices) {
         List<Table> tables = new ArrayList<>();

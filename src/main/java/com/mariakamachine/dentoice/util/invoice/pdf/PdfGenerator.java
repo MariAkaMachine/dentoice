@@ -27,9 +27,9 @@ import static java.lang.String.valueOf;
 import static java.lang.System.lineSeparator;
 
 @Slf4j
-public class InvoicePdfGenerator {
+public class PdfGenerator {
 
-    public FileResource generateMonthlyPdf(MonthlyEntity monthlyEntity, List<InvoiceEntity> invoices) {
+    public FileResource generateMonthlyPdfInvoice(MonthlyEntity monthlyEntity, List<InvoiceEntity> invoices) {
         final String pdfName = monthlyEntity.getDescription();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         //        Document pdf = new Document(A4, 50, 50, 110, 150);
@@ -41,9 +41,9 @@ public class InvoicePdfGenerator {
 
 //            PdfWriter writer = new PdfWriter(stream);
 //            pdf.open();
-//            writer.setPageEvent(new PdfPageNumberEvent(pdfName, true));
+//            writer.setPageEvent(new PdfPageEvent(pdfName, true));
 //            pdf.add(recipientDetails(monthlyEntity.getDentist()));
-//            addTablesToPdf(pdf, writer, new MonthlyPdfInvoice().generateTables(monthlyEntity, invoices));
+//            addTablesToPdf(pdf, writer, new MonthlyPdfInvoiceGenerator().generateTables(monthlyEntity, invoices));
         pdf.close();
 //        } catch (DocumentException e) {
 //            log.error("unable to generate pdf invoice for monthly invoice", e);
@@ -51,25 +51,16 @@ public class InvoicePdfGenerator {
         return new FileResource(new ByteArrayResource(stream.toByteArray()), format("%s - %s.pdf", invoices.get(0).getDentist().getLastName(), pdfName));
     }
 
-    public FileResource generatePdf(InvoiceEntity invoice) {
+    public FileResource generatePdfInvoice(InvoiceEntity invoice) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         PdfDocument pdf = new PdfDocument(new PdfWriter(stream));
         Document doc = new Document(pdf, A4);
 //        Document pdf = new Document(A4, 50, 50, 110, 150);
-        try {
-//            PdfWriter writer = getInstance(pdf, stream);
-//            pdf.open();
-//            writer.setPageEvent(new PdfPageNumberEvent(valueOf(invoice.getId()), false));
-            pdf.addEventHandler(END_PAGE, new PdfPageNumberEvent(doc, valueOf(invoice.getId()), false));
-            doc.add(headerCell());
-            doc.add(recipientDetails(invoice.getDentist()));
-            addTablesToPdf(doc, new PdfInvoice().generateTables(invoice));
-
-//        } catch (DocumentException e) {
-//            log.error("unable to generate pdf invoice for invoice {}", invoice.getId(), e);
-        } finally {
-            doc.close();
-        }
+        pdf.addEventHandler(END_PAGE, new PdfPageEvent(doc, valueOf(invoice.getId()), false));
+        doc.add(headerCell());
+        doc.add(recipientDetails(invoice.getDentist()));
+        addTablesToPdf(doc, new PdfInvoiceGenerator().generateTables(invoice));
+        doc.close();
         return new FileResource(new ByteArrayResource(stream.toByteArray()), format("%s.pdf", invoice.getId()));
     }
 

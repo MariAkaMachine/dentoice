@@ -24,7 +24,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Slf4j
-class PdfInvoice {
+class PdfInvoiceGenerator {
 
     public List<Table> generateTables(InvoiceEntity invoice) {
         List<Table> tables = new ArrayList<>();
