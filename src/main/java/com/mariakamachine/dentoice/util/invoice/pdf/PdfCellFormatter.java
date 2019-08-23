@@ -8,16 +8,22 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
 
-import java.math.BigDecimal;
-
 import static com.itextpdf.layout.borders.Border.NO_BORDER;
 import static com.itextpdf.layout.property.TextAlignment.*;
 
 
 public class PdfCellFormatter {
 
+    static Cell headerCell(String text) {
+        return marginCell(text, LEFT, 1).setBorderTop(new SolidBorder(1)).setBorderBottom(new SolidBorder(1));
+    }
+
     static Cell headerCell(String text, int colSpan) {
         return marginCell(text, LEFT, colSpan).setBorderTop(new SolidBorder(1)).setBorderBottom(new SolidBorder(1));
+    }
+
+    static Cell headerCellRight(String text) {
+        return marginCell(text, RIGHT, 1).setBorderTop(new SolidBorder(1)).setBorderBottom(new SolidBorder(1));
     }
 
     static Cell headerCellRight(String text, int colSpan) {

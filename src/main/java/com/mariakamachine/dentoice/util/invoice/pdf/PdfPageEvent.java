@@ -13,7 +13,6 @@ import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
 import com.mariakamachine.dentoice.data.entity.DentistEntity;
-import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.itextpdf.io.image.ImageDataFactory.create;
@@ -21,7 +20,6 @@ import static com.itextpdf.layout.borders.Border.NO_BORDER;
 import static com.itextpdf.layout.property.TextAlignment.CENTER;
 import static com.mariakamachine.dentoice.util.invoice.pdf.PdfCellFormatter.*;
 import static java.lang.String.format;
-import static java.lang.String.valueOf;
 import static java.lang.System.lineSeparator;
 
 @Slf4j
@@ -31,9 +29,9 @@ public class PdfPageEvent implements IEventHandler {
     private String parameter;
     private boolean isMonthly;
 
-    PdfPageEvent(InvoiceEntity invoice, boolean isMonthly) {
-        this.dentist = invoice.getDentist();
-        this.parameter = valueOf(invoice.getId());
+    PdfPageEvent(DentistEntity dentist, String parameter, boolean isMonthly) {
+        this.dentist = dentist;
+        this.parameter = parameter;
         this.isMonthly = isMonthly;
     }
 

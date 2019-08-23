@@ -49,24 +49,24 @@ class PdfInvoiceGenerator {
 
     private Table invoiceDetailsTable(InvoiceEntity invoice) {
         log.info("creating invoice details table");
-        Table table = new Table(2);
-        table.setWidth(createPercentValue(50));
-        table.setHorizontalAlignment(RIGHT);
-        table.addCell(cell("Rechnungsnummer:").setBorderTop(defaultBorder()).setBorderLeft(defaultBorder()));
-        table.addCell(cell(valueOf(invoice.getId())).setBorderTop(defaultBorder()).setBorderRight(defaultBorder()));
-        table.addCell(cell("Rechnungsdatum:").setBorderLeft(defaultBorder()));
-        table.addCell(cell(invoice.getDate().format(ofPattern("dd.MM.yyyy"))).setBorderRight(defaultBorder()).setBorderRight(defaultBorder()));
-        table.addCell(cell("XML-Nummer:").setBorderLeft(defaultBorder()));
-        table.addCell(cell(invoice.getXmlNumber()).setBorderRight(defaultBorder()));
-        table.addCell(cell("Patient:").setBorderLeft(defaultBorder()));
-        table.addCell(cell(invoice.getPatient()).setBorderRight(defaultBorder()));
-        table.addCell(cell("Art der Arbeit").setBorderLeft(defaultBorder()));
-        table.addCell(cell(invoice.getDescription()).setBorderRight(defaultBorder()));
-        table.addCell(cell("Kassenart:").setBorderLeft(defaultBorder()));
-        table.addCell(cell(invoice.getInsuranceType().toString()).setBorderRight(defaultBorder()));
-        table.addCell(cell("Zahnfarbe:").setBorderBottom(defaultBorder()).setBorderLeft(defaultBorder()));
-        table.addCell(cell(invoice.getColor()).setBorderBottom(defaultBorder()).setBorderRight(defaultBorder()));
-        return table;
+        return new Table(2)
+                .setWidth(createPercentValue(50))
+                .setHorizontalAlignment(RIGHT)
+
+                .addCell(cell("Rechnungsnummer:").setBorderTop(defaultBorder()).setBorderLeft(defaultBorder()))
+                .addCell(cell(valueOf(invoice.getId())).setBorderTop(defaultBorder()).setBorderRight(defaultBorder()))
+                .addCell(cell("Rechnungsdatum:").setBorderLeft(defaultBorder()))
+                .addCell(cell(invoice.getDate().format(ofPattern("dd.MM.yyyy"))).setBorderRight(defaultBorder()).setBorderRight(defaultBorder()))
+                .addCell(cell("XML-Nummer:").setBorderLeft(defaultBorder()))
+                .addCell(cell(invoice.getXmlNumber()).setBorderRight(defaultBorder()))
+                .addCell(cell("Patient:").setBorderLeft(defaultBorder()))
+                .addCell(cell(invoice.getPatient()).setBorderRight(defaultBorder()))
+                .addCell(cell("Art der Arbeit").setBorderLeft(defaultBorder()))
+                .addCell(cell(invoice.getDescription()).setBorderRight(defaultBorder()))
+                .addCell(cell("Kassenart:").setBorderLeft(defaultBorder()))
+                .addCell(cell(invoice.getInsuranceType().toString()).setBorderRight(defaultBorder()))
+                .addCell(cell("Zahnfarbe:").setBorderBottom(defaultBorder()).setBorderLeft(defaultBorder()))
+                .addCell(cell(invoice.getColor()).setBorderBottom(defaultBorder()).setBorderRight(defaultBorder()));
     }
 
     private Border defaultBorder() {
@@ -75,35 +75,40 @@ class PdfInvoiceGenerator {
 
     private Table costsTable(CostWrapperEntity costs, InvoiceSum invoiceSum) {
         log.info("creating costs table");
-        Table table = new Table(createPercentArray(20));
-        table.useAllAvailableWidth();
-        table.setHorizontalAlignment(CENTER);
-        costsHeaderRow(table);
+        Table table = new Table(createPercentArray(20))
+                .useAllAvailableWidth()
+                .setHorizontalAlignment(CENTER)
+
+                .addHeaderCell(headerCell("Position", 2))
+                .addHeaderCell(headerCell("Zahntechnische Leistung", 11))
+                .addHeaderCell(headerCell("Menge", 2))
+                .addHeaderCell(headerCellRight("Einzelpreis", 2))
+                .addHeaderCell(headerCellRight("Gesamtpreis", 3));
 
         for (EffortJsonb effort : costs.getEfforts()) {
-            table.addCell(cell(effort.getPosition(),2));
+            table.addCell(cell(effort.getPosition(), 2));
             table.addCell(cell(effort.getName(), 11));
-            table.addCell(cell(valueOf(effort.getQuantity()),2));
-            table.addCell(cellRight(valueOf(effort.getPricePerUnit()),2));
+            table.addCell(cell(valueOf(effort.getQuantity()), 2));
+            table.addCell(cellRight(valueOf(effort.getPricePerUnit()), 2));
             table.addCell(cellRight(calculateProduct(effort.getQuantity(), effort.getPricePerUnit()).toPlainString(), 3));
         }
 
         for (MaterialJsonb material : costs.getMaterials()) {
-            table.addCell(cell(material.getPosition(),2));
+            table.addCell(cell(material.getPosition(), 2));
             String description = material.getName();
             if (isNotBlank(material.getNotes())) {
                 description += "\n ";
                 description += material.getNotes();
             }
             table.addCell(cell(description, 11));
-            table.addCell(cell(valueOf(material.getQuantity()),2));
-            table.addCell(cellRight(BigDecimal.valueOf(material.getPricePerUnit()).toPlainString(),2));
+            table.addCell(cell(valueOf(material.getQuantity()), 2));
+            table.addCell(cellRight(BigDecimal.valueOf(material.getPricePerUnit()).toPlainString(), 2));
             table.addCell(cellRight(calculateProduct(material.getQuantity(), material.getPricePerUnit()).toPlainString(), 3));
         }
 
         addEmptyRow(table);
 
-        table.addCell(cell("",2));
+        table.addCell(cell("", 2));
         Cell metalsSumRow = cell(">> Berechnetes Edelmetall", 15);
         table.addCell(metalsSumRow);
         table.addCell(cellRight(invoiceSum.getMetal().toPlainString(), 3));
@@ -116,35 +121,26 @@ class PdfInvoiceGenerator {
         return table;
     }
 
-    private void costsHeaderRow(Table table) {
-        table.addHeaderCell(headerCell("Position", 2));
-        table.addHeaderCell(headerCell("Zahntechnische Leistung", 11));
-        table.addHeaderCell(headerCell("Menge", 2));
-        table.addHeaderCell(headerCellRight("Einzelpreis", 2));
-        table.addHeaderCell(headerCellRight("Gesamtpreis", 3));
-    }
-
     private Table footerTable(InvoiceEntity invoice, InvoiceSum invoiceSum) {
         log.info("creating footer table");
-        Table table = new Table(2);
-        table.setWidth(A4.getWidth() / 3);
-        table.setHorizontalAlignment(RIGHT);
+        return new Table(2)
+                .setWidth(A4.getWidth() / 3)
+                .setHorizontalAlignment(RIGHT)
 
-        table.addCell(cell("Material"));
-        table.addCell(cellRight(invoiceSum.getMaterials().toPlainString().concat(" €")));
+                .addCell(cell("Material"))
+                .addCell(cellRight(invoiceSum.getMaterials().toPlainString().concat(" €")))
 
-        table.addCell(cell("Leistung"));
-        table.addCell(cellRight(invoiceSum.getEfforts().toPlainString().concat(" €")));
+                .addCell(cell("Leistung"))
+                .addCell(cellRight(invoiceSum.getEfforts().toPlainString().concat(" €")))
 
-        table.addCell(cell("Netto").setBorderTop(new SolidBorder(1)));
-        table.addCell(cellRight(invoiceSum.getNetto().toPlainString().concat(" €")).setBorderTop(new SolidBorder(1)));
+                .addCell(cell("Netto").setBorderTop(new SolidBorder(1)))
+                .addCell(cellRight(invoiceSum.getNetto().toPlainString().concat(" €")).setBorderTop(new SolidBorder(1)))
 
-        table.addCell(cell(format("Mehrwertsteuer (%s%%)", invoice.getMwst())));
-        table.addCell(cellRight(invoiceSum.getMwst().toPlainString().concat(" €")));
+                .addCell(cell(format("Mehrwertsteuer (%s%%)", invoice.getMwst())))
+                .addCell(cellRight(invoiceSum.getMwst().toPlainString().concat(" €")))
 
-        table.addCell(cell("Gesamtbetrag").setBorderTop(new SolidBorder(1)).setBold());
-        table.addCell(cellRight(invoiceSum.getBrutto().toPlainString().concat(" €")).setBorderTop(new SolidBorder(1)).setBold());
-        return table;
+                .addCell(cell("Gesamtbetrag").setBorderTop(new SolidBorder(1)).setBold())
+                .addCell(cellRight(invoiceSum.getBrutto().toPlainString().concat(" €")).setBorderTop(new SolidBorder(1)).setBold());
     }
 
 }

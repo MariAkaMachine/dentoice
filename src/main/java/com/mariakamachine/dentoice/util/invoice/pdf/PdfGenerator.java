@@ -16,6 +16,7 @@ import java.util.List;
 import static com.itextpdf.kernel.events.PdfDocumentEvent.END_PAGE;
 import static com.itextpdf.kernel.geom.PageSize.A4;
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 
 @Slf4j
 public class PdfGenerator {
@@ -23,22 +24,15 @@ public class PdfGenerator {
     public FileResource generateMonthlyPdfInvoice(MonthlyEntity monthlyEntity, List<InvoiceEntity> invoices) {
         final String pdfName = monthlyEntity.getDescription();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                Document pdf = new Document(A4, 50, 50, 110, 150);
         PdfDocument pdf = new PdfDocument(new PdfWriter(stream));
         Document doc = new Document(pdf, A4);
-
-//        try {
-
-
-//            PdfWriter writer = new PdfWriter(stream);
-//            pdf.open();
-//            writer.setPageEvent(new PdfPageEvent(pdfName, true));
-//            pdf.add(recipientDetails(monthlyEntity.getDentist()));
-//            addTablesToPdf(pdf, writer, new MonthlyPdfInvoiceGenerator().generateTables(monthlyEntity, invoices));
-        pdf.close();
-//        } catch (DocumentException e) {
-//            log.error("unable to generate pdf invoice for monthly invoice", e);
-//        }
+        doc.setTopMargin(140);
+        doc.setBottomMargin(65);
+        pdf.addEventHandler(END_PAGE, new PdfPageEvent(monthlyEntity.getDentist(), pdfName, true));
+//        addTablesToPdf(doc, new MonthlyPdfInvoiceGenerator().generateTables(monthlyEntity, invoices));
+        new MonthlyPdfInvoiceGenerator().generateTables(monthlyEntity, invoices)
+                .forEach(doc::add);
+        doc.close();
         return new FileResource(new ByteArrayResource(stream.toByteArray()), format("%s - %s.pdf", invoices.get(0).getDentist().getLastName(), pdfName));
     }
 
@@ -46,14 +40,13 @@ public class PdfGenerator {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         PdfDocument pdf = new PdfDocument(new PdfWriter(stream));
         Document doc = new Document(pdf, A4);
-        try {
-            pdf.addEventHandler(END_PAGE, new PdfPageEvent(invoice, false));
-            doc.setTopMargin(140);
-            doc.setBottomMargin(65);
-            addTablesToPdf(doc, new PdfInvoiceGenerator().generateTables(invoice));
-        } finally {
-            doc.close();
-        }
+        doc.setTopMargin(140);
+        doc.setBottomMargin(65);
+        pdf.addEventHandler(END_PAGE, new PdfPageEvent(invoice.getDentist(), valueOf(invoice.getId()), false));
+        new PdfInvoiceGenerator().generateTables(invoice)
+                .forEach(doc::add);
+//        addTablesToPdf(doc, new PdfInvoiceGenerator().generateTables(invoice));
+        doc.close();
         return new FileResource(new ByteArrayResource(stream.toByteArray()), format("%s.pdf", invoice.getId()));
     }
 
