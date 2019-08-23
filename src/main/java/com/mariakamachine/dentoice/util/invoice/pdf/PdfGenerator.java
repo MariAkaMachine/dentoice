@@ -16,7 +16,6 @@ import java.util.List;
 import static com.itextpdf.kernel.events.PdfDocumentEvent.END_PAGE;
 import static com.itextpdf.kernel.geom.PageSize.A4;
 import static java.lang.String.format;
-import static java.lang.String.valueOf;
 
 @Slf4j
 public class PdfGenerator {
@@ -47,11 +46,14 @@ public class PdfGenerator {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         PdfDocument pdf = new PdfDocument(new PdfWriter(stream));
         Document doc = new Document(pdf, A4);
-        pdf.addEventHandler(END_PAGE, new PdfPageEvent(doc, invoice.getDentist(), valueOf(invoice.getId()), false));
-        doc.setTopMargin(160);
-        doc.setBottomMargin(100);
-        addTablesToPdf(doc, new PdfInvoiceGenerator().generateTables(invoice));
-        doc.close();
+        try {
+            pdf.addEventHandler(END_PAGE, new PdfPageEvent(invoice, false));
+            doc.setTopMargin(140);
+            doc.setBottomMargin(65);
+            addTablesToPdf(doc, new PdfInvoiceGenerator().generateTables(invoice));
+        } finally {
+            doc.close();
+        }
         return new FileResource(new ByteArrayResource(stream.toByteArray()), format("%s.pdf", invoice.getId()));
     }
 

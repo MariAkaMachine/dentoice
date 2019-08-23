@@ -26,8 +26,8 @@ public class PdfCellFormatter {
 
     private static Cell marginCell(String text, TextAlignment alignment, int colSpan) {
         Cell cell = cell(text, alignment, colSpan, NO_BORDER);
-        cell.setPaddingTop(5);
-        cell.setPaddingBottom(5);
+        cell.setPaddingTop(3);
+        cell.setPaddingBottom(3);
         return cell;
     }
 
@@ -73,7 +73,7 @@ public class PdfCellFormatter {
         return new Cell(1, colSpan)
                 .add(new Paragraph(text))
                 .setTextAlignment(alignment)
-                .setFontSize(10f)
+                .setFontSize(9f)
                 .setBorder(border);
     }
 

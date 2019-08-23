@@ -21,6 +21,7 @@ import static com.itextpdf.kernel.colors.Color.makeColor;
 import static com.itextpdf.kernel.geom.PageSize.A4;
 import static com.itextpdf.layout.property.HorizontalAlignment.CENTER;
 import static com.itextpdf.layout.property.HorizontalAlignment.RIGHT;
+import static com.itextpdf.layout.property.UnitValue.createPercentArray;
 import static com.itextpdf.layout.property.UnitValue.createPercentValue;
 import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateInvoice;
 import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateProduct;
@@ -37,8 +38,9 @@ class PdfInvoiceGenerator {
         List<Table> tables = new ArrayList<>();
         InvoiceSum invoiceSum = calculateInvoice(invoice);
         tables.add(invoiceDetailsTable(invoice));
-        tables.add(new Table(1).useAllAvailableWidth().addCell(fineCellCentered(" ")));
+        tables.add(new Table(1).useAllAvailableWidth().addCell(cell(" ").setHeight(5)));
         tables.add(costsTable(invoice.getCosts(), invoiceSum));
+        tables.add(new Table(1).useAllAvailableWidth().addCell(cell(" ").setHeight(20)));
         tables.add(new Table(1).useAllAvailableWidth().addCell(fineCell("Hinweis gemäß § 14 Absatz 4 Satz 1 Nr. 7 Umsatzsteuergesetz:\nZahlbar entsprechend Konditionenvereinbarung vom 30.7.2004").setBorderBottom(new SolidBorder(1))));
         tables.add(footerTable(invoice, invoiceSum));
         tables.add(new Table(1).useAllAvailableWidth().addCell(fineCell("Umsatzsteuer-Identifikationsnummer DE239653548").setBorderTop(new SolidBorder(1))));
@@ -68,58 +70,58 @@ class PdfInvoiceGenerator {
     }
 
     private Border defaultBorder() {
-        return new DashedBorder(makeColor(new Gray()), 2);
+        return new DashedBorder(makeColor(new Gray()), 1);
     }
 
     private Table costsTable(CostWrapperEntity costs, InvoiceSum invoiceSum) {
         log.info("creating costs table");
-        Table table = new Table(20);
+        Table table = new Table(createPercentArray(20));
         table.useAllAvailableWidth();
         table.setHorizontalAlignment(CENTER);
         costsHeaderRow(table);
 
         for (EffortJsonb effort : costs.getEfforts()) {
-            table.addCell(cell(effort.getPosition()));
-            table.addCell(cell(effort.getName(), 13));
-            table.addCell(cell(valueOf(effort.getQuantity())));
-            table.addCell(cellRight(valueOf(effort.getPricePerUnit())));
-            table.addCell(cellRight(calculateProduct(effort.getQuantity(), effort.getPricePerUnit()).toPlainString(), 4));
+            table.addCell(cell(effort.getPosition(),2));
+            table.addCell(cell(effort.getName(), 11));
+            table.addCell(cell(valueOf(effort.getQuantity()),2));
+            table.addCell(cellRight(valueOf(effort.getPricePerUnit()),2));
+            table.addCell(cellRight(calculateProduct(effort.getQuantity(), effort.getPricePerUnit()).toPlainString(), 3));
         }
 
         for (MaterialJsonb material : costs.getMaterials()) {
-            table.addCell(cell(material.getPosition()));
+            table.addCell(cell(material.getPosition(),2));
             String description = material.getName();
             if (isNotBlank(material.getNotes())) {
                 description += "\n ";
                 description += material.getNotes();
             }
-            table.addCell(cell(description, 13));
-            table.addCell(cell(valueOf(material.getQuantity())));
-            table.addCell(cellRight(BigDecimal.valueOf(material.getPricePerUnit()).toPlainString()));
-            table.addCell(cellRight(calculateProduct(material.getQuantity(), material.getPricePerUnit()).toPlainString(), 4));
+            table.addCell(cell(description, 11));
+            table.addCell(cell(valueOf(material.getQuantity()),2));
+            table.addCell(cellRight(BigDecimal.valueOf(material.getPricePerUnit()).toPlainString(),2));
+            table.addCell(cellRight(calculateProduct(material.getQuantity(), material.getPricePerUnit()).toPlainString(), 3));
         }
 
         addEmptyRow(table);
 
-        table.addCell(cell(""));
-        Cell metalsSumRow = cell(">>> Berechnetes Edelmetall", 15);
+        table.addCell(cell("",2));
+        Cell metalsSumRow = cell(">> Berechnetes Edelmetall", 15);
         table.addCell(metalsSumRow);
-        table.addCell(cellRight(invoiceSum.getMetal().toPlainString(), 4));
+        table.addCell(cellRight(invoiceSum.getMetal().toPlainString(), 3));
 
         addEmptyRow(table);
 
         table.addCell(cell(""));
-        table.addCell(fineCell("Diese Sonderanfertigung wurde unter Einhaltung der grundlegenden Anforderungen des Anhang I der Richlinie 93/42/EWG erstellt. Sie ist ausschliesslich für den oben genannten Patienten bestimmt.", 15));
+        table.addCell(fineCell("Diese Sonderanfertigung wurde unter Einhaltung der grundlegenden Anforderungen des Anhang I der Richlinie 93/42/EWG erstellt. Sie ist ausschliesslich für den oben genannten Patienten bestimmt.", 16));
 
         return table;
     }
 
     private void costsHeaderRow(Table table) {
-        table.addCell(headerCell("Position", 1));
-        table.addCell(headerCell("Zahntechnische Leistung", 13));
-        table.addCell(headerCell("Menge", 1));
-        table.addCell(headerCellRight("Einzelpreis", 1));
-        table.addCell(headerCellRight("Gesamtpreis", 4));
+        table.addHeaderCell(headerCell("Position", 2));
+        table.addHeaderCell(headerCell("Zahntechnische Leistung", 11));
+        table.addHeaderCell(headerCell("Menge", 2));
+        table.addHeaderCell(headerCellRight("Einzelpreis", 2));
+        table.addHeaderCell(headerCellRight("Gesamtpreis", 3));
     }
 
     private Table footerTable(InvoiceEntity invoice, InvoiceSum invoiceSum) {
