@@ -2,13 +2,13 @@ spring:
   application:
     name: dentoice-service
   datasource:
-    url: jdbc:postgresql://${db.host:localhost}:2345/dentoice
+    url: jdbc:postgresql://${db.host:172.17.0.2}:5432/dentoice
     username: dentoice
     password: ${general.password:}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: com.mariakamachine.dentoice.config.postgres.JsonbPostgresSqlDialect
@@ -18,8 +18,8 @@ spring:
   jmx:
     enabled: false
   liquibase:
-    enabled: true
-    drop-first: true
+    enabled: false
+    drop-first: false
     user: dentoice
   mail:
     host: smtp.gmail.com
