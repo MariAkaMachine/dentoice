@@ -11,13 +11,15 @@ import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.property.TextAlignment;
 import com.mariakamachine.dentoice.data.entity.DentistEntity;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 
 import static com.itextpdf.io.image.ImageDataFactory.create;
 import static com.itextpdf.layout.borders.Border.NO_BORDER;
 import static com.itextpdf.layout.property.TextAlignment.CENTER;
+import static com.itextpdf.layout.property.TextAlignment.RIGHT;
 import static com.mariakamachine.dentoice.util.invoice.pdf.PdfCellFormatter.*;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
@@ -28,6 +30,9 @@ public class PdfPageEvent implements IEventHandler {
     private DentistEntity dentist;
     private String parameter;
     private boolean isMonthly;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     PdfPageEvent(DentistEntity dentist, String parameter, boolean isMonthly) {
         this.dentist = dentist;
@@ -72,17 +77,16 @@ public class PdfPageEvent implements IEventHandler {
                 .setFontSize(14f)
                 .setItalic());
         try {
+//            String path = ResourceUtils.getFile("classpath:BOOT-INF/classes/static/img/tooth_icon.png").getAbsolutePath();
             table.addCell(new Cell()
-                    .add(new Image(create("./src/main/resources/static/img/tooth_icon.png")).scaleToFit(50, 50))
+                    .add(new Image(create("classpath:BOOT-INF/classes/static/img/tooth_icon.png")).scaleToFit(50, 50))
                     .setBorder(NO_BORDER)
-                    .setPaddingLeft(25)
-            );
+                    .setPaddingLeft(25));
         } catch (Exception e) {
-            log.error("could not load golden tooth logo");
+            log.error("could not load golden tooth logo", e);
         }
 
-        String address = new String()
-                .concat("Waldkapellenweg 7").concat(lineSeparator())
+        String address = "Waldkapellenweg 7".concat(lineSeparator())
                 .concat("72108 Rottenburg").concat(lineSeparator())
                 .concat("tel. 07073 / 919 718").concat(lineSeparator())
                 .concat("fax 07073 / 919 719").concat(lineSeparator());
@@ -111,13 +115,13 @@ public class PdfPageEvent implements IEventHandler {
 
         Table ziw_logo = new Table(1).useAllAvailableWidth();
         try {
+//            String uri = ResourceUtils.getFile("classpath:BOOT-INF/classes/static/img/logo-ziw-bw.png").getAbsolutePath();
             ziw_logo.addCell(new Cell()
-                    .add(new Image(create("./src/main/resources/static/img/logo-ziw-bw.png")).scaleToFit(65, 65))
+                    .add(new Image(create("classpath:BOOT-INF/classes/static/img/logo-ziw-bw.png")).scaleToFit(65, 65))
                     .setBorder(NO_BORDER)
-                    .setTextAlignment(TextAlignment.RIGHT)
-            );
+                    .setTextAlignment(RIGHT));
         } catch (Exception e) {
-            log.error("could not load golden tooth logo");
+            log.error("could not load ziw logo", e);
         }
         new Canvas(canvas, document, new Rectangle(page.getPageSize().getWidth() - 100, 50, page.getPageSize().getWidth() / 4, 20))
                 .add(ziw_logo);
