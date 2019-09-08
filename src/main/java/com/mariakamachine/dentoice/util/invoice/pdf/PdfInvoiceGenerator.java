@@ -23,6 +23,7 @@ import static com.itextpdf.layout.property.HorizontalAlignment.CENTER;
 import static com.itextpdf.layout.property.HorizontalAlignment.RIGHT;
 import static com.itextpdf.layout.property.UnitValue.createPercentArray;
 import static com.itextpdf.layout.property.UnitValue.createPercentValue;
+import static com.mariakamachine.dentoice.data.enums.InvoiceType.ESTIMATE;
 import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateInvoice;
 import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateProduct;
 import static com.mariakamachine.dentoice.util.invoice.pdf.PdfCellFormatter.*;
@@ -36,6 +37,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 class PdfInvoiceGenerator {
 
     public List<Table> generateTables(InvoiceEntity invoice) {
+        log.info("generating invoice table");
         List<Table> tables = new ArrayList<>();
         InvoiceSum invoiceSum = calculateInvoice(invoice);
         tables.add(invoiceDetailsTable(invoice));
@@ -50,11 +52,16 @@ class PdfInvoiceGenerator {
 
     private Table invoiceDetailsTable(InvoiceEntity invoice) {
         log.info("creating invoice details table");
+
+        String invoiceType = "Rechnungsnummer:";
+        if (invoice.getInvoiceType().equals(ESTIMATE)) {
+            invoiceType = "Kostenvoranschlag:";
+        }
         return new Table(2)
                 .setWidth(createPercentValue(50))
                 .setHorizontalAlignment(RIGHT)
 
-                .addCell(cell("Rechnungsnummer:").setBorderTop(defaultBorder()).setBorderLeft(defaultBorder()))
+                .addCell(cell(invoiceType).setBorderTop(defaultBorder()).setBorderLeft(defaultBorder()))
                 .addCell(cell(valueOf(invoice.getId())).setBorderTop(defaultBorder()).setBorderRight(defaultBorder()))
                 .addCell(cell("Rechnungsdatum:").setBorderLeft(defaultBorder()))
                 .addCell(cell(invoice.getDate().format(ofPattern("dd.MM.yyyy"))).setBorderRight(defaultBorder()).setBorderRight(defaultBorder()))
@@ -87,6 +94,7 @@ class PdfInvoiceGenerator {
                 .addHeaderCell(headerCellRight("Gesamtpreis", 3));
 
         for (EffortJsonb effort : costs.getEfforts()) {
+            log.info("writing effort {}", effort.getPosition());
             table.addCell(cell(effort.getPosition(), 2));
             table.addCell(cell(effort.getName(), 11));
             table.addCell(cell(valueOf(effort.getQuantity()), 2));
@@ -95,6 +103,7 @@ class PdfInvoiceGenerator {
         }
 
         for (MaterialJsonb material : costs.getMaterials()) {
+            log.info("writing material {}", material.getPosition());
             table.addCell(cell(material.getPosition(), 2));
             String description = material.getName();
             if (isNotBlank(material.getNotes())) {
