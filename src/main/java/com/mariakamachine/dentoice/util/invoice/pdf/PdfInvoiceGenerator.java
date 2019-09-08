@@ -29,6 +29,7 @@ import static com.mariakamachine.dentoice.util.invoice.pdf.PdfCellFormatter.*;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Slf4j
@@ -66,7 +67,7 @@ class PdfInvoiceGenerator {
                 .addCell(cell("Kassenart:").setBorderLeft(defaultBorder()))
                 .addCell(cell(invoice.getInsuranceType().toString()).setBorderRight(defaultBorder()))
                 .addCell(cell("Zahnfarbe:").setBorderBottom(defaultBorder()).setBorderLeft(defaultBorder()))
-                .addCell(cell(invoice.getColor()).setBorderBottom(defaultBorder()).setBorderRight(defaultBorder()));
+                .addCell(cell(isBlank(invoice.getColor()) ? "" : invoice.getColor()).setBorderBottom(defaultBorder()).setBorderRight(defaultBorder()));
     }
 
     private Border defaultBorder() {
