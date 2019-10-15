@@ -28,12 +28,14 @@ public class EffortJsonb implements Serializable {
     @NotNull
     @Min(0)
     private Double pricePerUnit;
+    private Boolean isPrivate;
 
     public EffortJsonb(Effort effort) {
         this.position = effort.getPosition();
         this.name = effort.getName();
         this.quantity = effort.getQuantity();
         this.pricePerUnit = effort.getPricePerUnit();
+        this.isPrivate = effort.getIsPrivate();
     }
 
     public EffortJsonb(Effort effort, EffortEntity entity) {
@@ -41,6 +43,7 @@ public class EffortJsonb implements Serializable {
         this.name = isBlank(effort.getName()) ? entity.getName() : effort.getName();
         this.quantity = effort.getQuantity();
         this.pricePerUnit = effort.getPricePerUnit() == null ? entity.getPricePerUnit() : effort.getPricePerUnit();
+        this.isPrivate = effort.getIsPrivate();
     }
 
 }
