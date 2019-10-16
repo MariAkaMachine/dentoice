@@ -23,6 +23,6 @@ public class Effort {
     @Min(0)
     Double pricePerUnit;
     @NotNull
-    private Boolean isPrivate;
+    private Boolean isPrivate = false;
 
 }

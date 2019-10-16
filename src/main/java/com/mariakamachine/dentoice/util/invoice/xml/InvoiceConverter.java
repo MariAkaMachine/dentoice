@@ -4,18 +4,14 @@ import com.mariakamachine.dentoice.config.properties.InvoiceProperties;
 import com.mariakamachine.dentoice.data.entity.InvoiceEntity;
 import com.mariakamachine.dentoice.data.jsonb.EffortJsonb;
 import com.mariakamachine.dentoice.data.jsonb.MaterialJsonb;
-import com.mariakamachine.dentoice.model.xml.Laborabrechnung;
-import com.mariakamachine.dentoice.model.xml.MwstGruppe;
-import com.mariakamachine.dentoice.model.xml.Position;
-import com.mariakamachine.dentoice.model.xml.Rechnung;
+import com.mariakamachine.dentoice.model.xml.*;
 import com.mariakamachine.dentoice.util.invoice.InvoiceSum;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mariakamachine.dentoice.model.xml.Art.BEL;
-import static com.mariakamachine.dentoice.model.xml.Art.MAT;
+import static com.mariakamachine.dentoice.model.xml.Art.*;
 import static com.mariakamachine.dentoice.util.invoice.InvoiceCalculator.calculateInvoice;
 import static java.lang.Integer.valueOf;
 import static java.math.BigDecimal.ROUND_HALF_DOWN;
@@ -55,7 +51,13 @@ public class InvoiceConverter {
     }
 
     private Position effortToPosition(EffortJsonb effort) {
-        return new Position(BEL, effort.getPosition(), effort.getName(), convertToXsdConformInteger(effort.getPricePerUnit()), effort.getQuantity().intValue());
+        Art art = BEL;
+        String position = effort.getPosition();
+        if (null != effort.getIsPrivate() && effort.getIsPrivate()) {
+            art = NBL;
+            position = null;
+        }
+        return new Position(art, position, effort.getName(), convertToXsdConformInteger(effort.getPricePerUnit()), effort.getQuantity().intValue());
     }
 
     private Position materialToPosition(MaterialJsonb material) {

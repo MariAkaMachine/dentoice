@@ -26,6 +26,6 @@ public class Material {
     @NotNull
     private Boolean isMetal;
     @NotNull
-    private Boolean isPrivate;
+    private Boolean isPrivate = false;
 
 }
