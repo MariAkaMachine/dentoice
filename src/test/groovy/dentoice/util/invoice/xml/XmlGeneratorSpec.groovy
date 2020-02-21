@@ -50,8 +50,8 @@ class XmlGeneratorSpec extends Specification {
                 <Laborabrechnung Version="4.0" xsi:noNamespaceSchemaLocation="Laborabrechnungsdaten_(KZBV-VDZI-VDDS)_(V4-4).xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                     <Rechnung Laborsoftwarehersteller="Marius Baumann" Laborsoftware="dentoice" Laborsoftwareversion="0.0.1" Laborname="Dentaltechnik Udo Baumann" Herstellungsort="D-Rottenburg" Abrechnungsbereich="BW" Laborlieferdatum="2018-03-13" Laborrechnungsnummer="18031234" Auftragsnummer="617200-F7357-KB-66399-2044-2" Gesamtbetrag_netto="20698" Mehrwertsteuer_gesamt="1449" Gesamtbetrag_brutto="22147">
                         <MWST-Gruppe Zwischensumme_netto="20698" Mehrwertsteuersatz="70" Mehrwertsteuerbetrag="1449">
-                            <Position Art="BEL" Nummer="0732" Beschreibung="Desinfektion" Einzelpreis="632" Menge="1"/>
-                            <Position Art="BEL" Nummer="0001" Beschreibung="Modell aus Hartgips" Einzelpreis="808" Menge="2"/>
+                            <Position Art="BEL" Nummer="0732" Beschreibung="Desinfektion" Einzelpreis="632" Menge="1000"/>
+                            <Position Art="BEL" Nummer="0001" Beschreibung="Modell aus Hartgips" Einzelpreis="808" Menge="2000"/>
                             <Position Art="MAT" Beschreibung="PlatinLloyd 100" Einzelpreis="5125" Menge="3600"/>
                         </MWST-Gruppe>
                     </Rechnung>

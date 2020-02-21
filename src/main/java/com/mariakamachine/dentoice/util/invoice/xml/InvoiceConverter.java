@@ -57,7 +57,7 @@ public class InvoiceConverter {
             art = NBL;
             position = null;
         }
-        return new Position(art, position, effort.getName(), convertToXsdConformInteger(effort.getPricePerUnit()), effort.getQuantity().intValue());
+        return new Position(art, position, effort.getName(), convertToXsdConformInteger(effort.getPricePerUnit()), convertToXsdConformInteger(effort.getQuantity() * 10));
     }
 
     private Position materialToPosition(MaterialJsonb material) {
