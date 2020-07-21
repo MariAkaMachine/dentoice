@@ -126,7 +126,8 @@ class PdfInvoiceGenerator {
         addEmptyRow(table);
 
         table.addCell(cell(""));
-        table.addCell(fineCell("Diese Sonderanfertigung wurde unter Einhaltung der grundlegenden Anforderungen des Anhang I der Richlinie 93/42/EWG erstellt. Sie ist ausschliesslich für den oben genannten Patienten bestimmt.", 16));
+        table.addCell(fineCell("Wir sichern zu, dass diese Sonderanfertigung den in Anhang I der Verordnung (EU) 2017/745 angegebenen grundlegenden Sicherheits- und Leistungsanforderungen entspricht und ausschließlich für den oben genannten Patienten bestimmt ist.", 16));
+//        table.addCell(fineCell("Diese Sonderanfertigung wurde unter Einhaltung der grundlegenden Anforderungen des Anhang I der Richlinie 93/42/EWG erstellt. Sie ist ausschliesslich für den oben genannten Patienten bestimmt.", 16));
 
         return table;
     }
