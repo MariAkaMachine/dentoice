@@ -26,14 +26,14 @@
 ## upgrade old setup
 
 ### initial database setup
-- docker run --name dentoice-postgres -d -v /home/edith/Schreibtisch/dentoice:/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=<pw> -e POSTGRES_USER=dentoice postgres:10.6-alpine
-- docker run --name postgres-smoke -d -v /home/edith/Schreibtisch/smoke:/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=<pw> -e POSTGRES_USER=dentoice postgres:10.6-alpine
+- `docker run --name dentoice-postgres -d -v /home/edith/Schreibtisch/dentoice:/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=<pw> -e POSTGRES_USER=dentoice postgres:10.6-alpine`
+- `docker run --name postgres-smoke -d -v /home/edith/Schreibtisch/smoke:/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD=<pw> -e POSTGRES_USER=dentoice postgres:10.6-alpine`
 
 ### pull image 
-- docker tag marschine/dentoice-service:latest marschine/dentoice-service:old
-- docker pull marschine/dentoice-service
+- `docker tag marschine/dentoice-service:latest marschine/dentoice-service:old`
+- `docker pull marschine/dentoice-service`
 
 ### run new image
-- docker rename dentoice-service dentoice-service-old
-- docker start postgres-smoke
-- docker run -i -p 9876:9876 --name dentoice-service marschine/dentoice-service
+- `docker rename dentoice-service dentoice-service-old`
+- `docker start postgres-smoke`
+- `docker run -i -p 9876:9876 --name dentoice-service marschine/dentoice-service`
