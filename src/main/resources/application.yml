@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://${db.host:172.17.0.2}:5432/dentoice
     username: dentoice
-    password: ${general.password:}
+    password: ${general.password:F3s2pJ84Dn}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -25,7 +25,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: dentaltechnik.baumann
-    password: ${general.password:}
+    password: ${general.password:F3s2pJ84Dn}
     properties:
       mail:
         smtp:
